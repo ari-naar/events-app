@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../config/theme/app_colors.dart';
@@ -10,6 +11,7 @@ import '../../../core/models/event.dart';
 import 'age_range_sheet.dart';
 import 'notification_settings_sheet.dart';
 import 'recurring_options_sheet.dart';
+import 'package:flutter/services.dart';
 
 class CreateEventBottomSheet extends StatefulWidget {
   const CreateEventBottomSheet({super.key});
@@ -953,6 +955,9 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   }
 
   void _showCompletionScreen(Event event) {
+    // Close the create event modal first
+    Navigator.pop(context, event);
+
     showCupertinoModalPopup(
       context: context,
       builder: (context) => Container(
@@ -966,7 +971,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
             // Success Icon and Title
             Container(
               width: double.infinity,
-              padding: EdgeInsets.only(top: 48.h, bottom: 32.h),
+              padding: EdgeInsets.only(top: 64.h, bottom: 48.h),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
@@ -974,31 +979,31 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
               child: Column(
                 children: [
                   Container(
-                    width: 64.w,
-                    height: 64.w,
+                    width: 80.w,
+                    height: 80.w,
                     decoration: BoxDecoration(
                       color: AppColors.success.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       CupertinoIcons.checkmark_circle_fill,
-                      size: 32.sp,
+                      size: 40.sp,
                       color: AppColors.success,
                     ),
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: 32.h),
                   Text(
                     'Event Created Successfully',
-                    style: AppTypography.titleMedium.copyWith(
-                      color: Colors.black,
-                    ),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
-                  SizedBox(height: 8.h),
+                  SizedBox(height: 12.h),
                   Text(
                     event.name,
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.textLight,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: AppColors.textLight,
+                        ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -1008,16 +1013,17 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
             // Share Section
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Sharable Link
                     Container(
-                      padding: EdgeInsets.all(16.w),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.w, vertical: 16.h),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(16.r),
                       ),
                       child: Row(
                         children: [
@@ -1026,77 +1032,97 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                             size: 20.sp,
                             color: AppColors.textLight,
                           ),
-                          SizedBox(width: 12.w),
+                          SizedBox(width: 16.w),
                           Expanded(
                             child: Text(
                               'events.app/e/${event.id}',
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: Colors.black,
-                              ),
+                              style: Theme.of(context).textTheme.titleSmall,
                             ),
                           ),
                           CupertinoButton(
                             padding: EdgeInsets.zero,
-                            onPressed: () {
-                              // TODO: Implement copy link
+                            onPressed: () async {
+                              final link = 'events.app/e/${event.id}';
+                              await Clipboard.setData(
+                                  ClipboardData(text: link));
+                              if (!mounted) return;
+
+                              // Show copy feedback
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Link copied to clipboard',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: AppColors.success,
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                ),
+                              );
                             },
                             child: Text(
                               'Copy',
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.accent,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    color: AppColors.accent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 32.h),
+                    SizedBox(height: 48.h),
 
                     // Share Options
                     Text(
                       'Share via',
-                      style: AppTypography.titleSmall.copyWith(
-                        color: Colors.black,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 24.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildShareOption(
-                          icon: CupertinoIcons.chat_bubble_fill,
-                          label: 'WhatsApp',
+                          icon: HugeIcons.strokeRoundedMessage01,
+                          label: 'Messages',
                           color: const Color(0xFF25D366),
                           onTap: () => _shareViaWhatsApp(event),
                         ),
                         _buildShareOption(
-                          icon: CupertinoIcons.camera_fill,
+                          icon: HugeIcons.strokeRoundedInstagram,
                           label: 'Instagram',
                           color: const Color(0xFFE4405F),
                           onTap: () => _shareViaInstagram(event),
                         ),
                         _buildShareOption(
-                          icon: CupertinoIcons.at,
+                          icon: HugeIcons.strokeRoundedNewTwitter,
                           label: 'X',
                           color: Colors.black,
                           onTap: () => _shareViaX(event),
                         ),
                         _buildShareOption(
-                          icon: CupertinoIcons.person_2_fill,
+                          icon: HugeIcons.strokeRoundedFacebook02,
                           label: 'Facebook',
                           color: const Color(0xFF1877F2),
                           onTap: () => _shareViaFacebook(event),
                         ),
                         _buildShareOption(
-                          icon: CupertinoIcons.mail_solid,
+                          icon: HugeIcons.strokeRoundedMail01,
                           label: 'Email',
                           color: AppColors.textLight,
                           onTap: () => _shareViaEmail(event),
                         ),
                       ],
                     ),
-                    SizedBox(height: 32.h),
+                    SizedBox(height: 36.h),
 
                     // Share Button
                     SizedBox(
@@ -1104,7 +1130,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                       child: CupertinoButton(
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(16.r),
                         onPressed: () => _shareNative(event),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1114,19 +1140,22 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                               size: 20.sp,
                               color: AppColors.accent,
                             ),
-                            SizedBox(width: 8.w),
+                            SizedBox(width: 12.w),
                             Text(
                               'More Options',
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.accent,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    color: AppColors.accent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 10.h),
 
                     // View Button
                     SizedBox(
@@ -1134,18 +1163,17 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                       child: CupertinoButton(
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         color: AppColors.accent,
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(16.r),
                         onPressed: () {
                           Navigator.pop(context); // Close completion screen
-                          Navigator.pop(context,
-                              event); // Return event and close create screen
                         },
                         child: Text(
                           'View Event',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                         ),
                       ),
                     ),
@@ -1174,31 +1202,30 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
           child: CupertinoButton(
             padding: EdgeInsets.zero,
             onPressed: () {
-              // Add tap animation
               HapticFeedback.lightImpact();
               _animateShareButton(context, onTap);
             },
             child: Column(
               children: [
                 Container(
-                  width: 48.w,
-                  height: 48.w,
+                  width: 56.w,
+                  height: 56.w,
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: Icon(
                     icon,
                     color: color,
-                    size: 24.sp,
+                    size: 28.sp,
                   ),
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 12.h),
                 Text(
                   label,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textLight,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
               ],
             ),

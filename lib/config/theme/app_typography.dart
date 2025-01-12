@@ -1,68 +1,88 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppTypography {
-  static const String fontFamily = 'Inter';
+  static TextStyle get displayLarge => TextStyle(
+        fontSize: 32.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.2,
+        letterSpacing: -0.2,
+      );
 
-  static const TextStyle displayLarge = TextStyle(
-    fontSize: 32,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-    letterSpacing: -0.5,
-  );
+  static TextStyle get displayMedium => TextStyle(
+        fontSize: 28.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.2,
+        letterSpacing: -0.2,
+      );
 
-  static const TextStyle displayMedium = TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
-    letterSpacing: -0.5,
-  );
+  static TextStyle get displaySmall => TextStyle(
+        fontSize: 24.sp,
+        fontWeight: FontWeight.w700,
+        height: 1.2,
+        letterSpacing: -0.2,
+      );
 
-  static const TextStyle titleLarge = TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get titleLarge => TextStyle(
+        fontSize: 22.sp,
+        fontWeight: FontWeight.w600,
+        height: 1.3,
+        letterSpacing: -0.2,
+      );
 
-  static const TextStyle titleMedium = TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get titleMedium => TextStyle(
+        fontSize: 18.sp,
+        fontWeight: FontWeight.w600,
+        height: 1.3,
+        letterSpacing: -0.2,
+      );
 
-  static const TextStyle titleSmall = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get titleSmall => TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        height: 1.3,
+        letterSpacing: -0.1,
+      );
 
-  static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get bodyLarge => TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w400,
+        height: 1.5,
+        letterSpacing: 0,
+      );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get bodyMedium => TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w400,
+        height: 1.5,
+        letterSpacing: 0,
+      );
 
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textLight,
-  );
+  static TextStyle get bodySmall => TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w400,
+        height: 1.5,
+        letterSpacing: 0,
+      );
 
-  static const TextStyle labelLarge = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get labelLarge => TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.4,
+        letterSpacing: 0,
+      );
 
-  static const TextStyle labelMedium = TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get labelMedium => TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.4,
+        letterSpacing: 0,
+      );
+
+  static TextStyle get labelSmall => TextStyle(
+        fontSize: 10.sp,
+        fontWeight: FontWeight.w500,
+        height: 1.4,
+        letterSpacing: 0,
+      );
 }
