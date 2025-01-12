@@ -17,15 +17,21 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const Center(child: Text('Home Feed')), // Home screen
     const Center(child: Text('Search')), // Search screen
-    const Center(child: Text('Create Event')), // Create Event screen
-    const Center(child: Text('Events')), // Events screen
-    const Center(child: Text('Profile')), // Profile screen
+    const EventListScreen(), // Events screen
+    const ProfileScreen(), // Profile screen
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 2) {
+      // Create button index
+      CreateEventBottomSheet.show(context);
+    } else {
+      // Adjust index for the screens list since we removed the create screen
+      final adjustedIndex = index > 2 ? index - 1 : index;
+      setState(() {
+        _selectedIndex = adjustedIndex;
+      });
+    }
   }
 
   @override
@@ -38,7 +44,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
-        selectedIndex: _selectedIndex,
+        selectedIndex: _selectedIndex > 1
+            ? _selectedIndex + 1
+            : _selectedIndex, // Adjust for nav bar highlighting
         onItemSelected: _onItemTapped,
       ),
     );
