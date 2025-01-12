@@ -519,57 +519,64 @@ class ParticipantDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      backgroundColor: AppColors.background,
-      navigationBar: CupertinoNavigationBar(
+    final int tabCount =
+        3 + (event.hasWaitlist ? 1 : 0); // Base tabs + waitlist if enabled
+
+    return Material(
+      color: AppColors.background,
+      child: CupertinoPageScaffold(
         backgroundColor: AppColors.background,
-        border: null,
-        middle: Text(
-          'Participant Details',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                height: 1.3,
-              ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: AppColors.background,
+          border: null,
+          middle: Text(
+            'Participant Details',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
+                ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-      ),
-      child: SafeArea(
-        child: DefaultTabController(
-          length: 4,
-          child: Column(
-            children: [
-              Container(
-                color: AppColors.surface,
-                child: TabBar(
-                  labelColor: AppColors.accent,
-                  unselectedLabelColor: AppColors.textLight,
-                  indicatorColor: AppColors.accent,
-                  tabs: [
-                    Tab(
-                        text:
-                            'All (${event.participants.length + event.waitlist.length})'),
-                    Tab(text: 'Going (${event.participants.length})'),
-                    if (event.hasWaitlist)
-                      Tab(text: 'Waitlist (${event.waitlist.length})'),
-                    Tab(text: 'Declined (0)'), // TODO: Add declined count
-                  ],
+        child: SafeArea(
+          child: DefaultTabController(
+            length: tabCount,
+            child: Column(
+              children: [
+                Material(
+                  color: AppColors.surface,
+                  child: TabBar(
+                    isScrollable: true,
+                    labelColor: AppColors.accent,
+                    unselectedLabelColor: AppColors.textLight,
+                    indicatorColor: AppColors.accent,
+                    tabs: [
+                      Tab(
+                          text:
+                              'All (${event.participants.length + event.waitlist.length})'),
+                      Tab(text: 'Going (${event.participants.length})'),
+                      Tab(text: 'Declined (0)'), // TODO: Add declined count
+                      if (event.hasWaitlist)
+                        Tab(text: 'Waitlist (${event.waitlist.length})'),
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _buildParticipantList(
-                        context, [...event.participants, ...event.waitlist]),
-                    _buildParticipantList(context, event.participants),
-                    if (event.hasWaitlist)
-                      _buildParticipantList(context, event.waitlist),
-                    _buildParticipantList(
-                        context, []), // TODO: Add declined list
-                  ],
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      _buildParticipantList(
+                          context, [...event.participants, ...event.waitlist]),
+                      _buildParticipantList(context, event.participants),
+                      _buildParticipantList(
+                          context, []), // TODO: Add declined list
+                      if (event.hasWaitlist)
+                        _buildParticipantList(context, event.waitlist),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -590,58 +597,62 @@ class ParticipantDetailsSheet extends StatelessWidget {
       );
     }
 
-    return ListView.separated(
-      padding: EdgeInsets.all(20.w),
-      itemCount: participants.length,
-      separatorBuilder: (context, index) => Divider(height: 20.h),
-      itemBuilder: (context, index) {
-        return Row(
-          children: [
-            Container(
-              width: 40.w,
-              height: 40.w,
-              decoration: BoxDecoration(
-                color: AppColors.accent.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Icon(
-                  CupertinoIcons.person_fill,
-                  size: 20.sp,
-                  color: AppColors.accent,
+    return Material(
+      color: AppColors.background,
+      child: ListView.separated(
+        padding: EdgeInsets.all(20.w),
+        itemCount: participants.length,
+        separatorBuilder: (context, index) => Divider(height: 20.h),
+        itemBuilder: (context, index) {
+          return Row(
+            children: [
+              Container(
+                width: 40.w,
+                height: 40.w,
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    CupertinoIcons.person_fill,
+                    size: 20.sp,
+                    color: AppColors.accent,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    participants[index], // TODO: Replace with actual user name
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                        ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    'user@example.com', // TODO: Replace with actual user email
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.textLight,
-                          height: 1.3,
-                        ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      participants[
+                          index], // TODO: Replace with actual user name
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      'user@example.com', // TODO: Replace with actual user email
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: AppColors.textLight,
+                            height: 1.3,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 }
