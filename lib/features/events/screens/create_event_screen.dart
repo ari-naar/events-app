@@ -963,7 +963,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
             // Success Icon and Title
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 32.h),
+              padding: EdgeInsets.only(top: 48.h, bottom: 32.h),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
@@ -971,30 +971,32 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
               child: Column(
                 children: [
                   Container(
-                    width: 80.w,
-                    height: 80.w,
+                    width: 64.w,
+                    height: 64.w,
                     decoration: BoxDecoration(
                       color: AppColors.success.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       CupertinoIcons.checkmark_circle_fill,
-                      size: 40.sp,
+                      size: 32.sp,
                       color: AppColors.success,
                     ),
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: 24.h),
                   Text(
-                    event.name,
-                    style: AppTypography.titleLarge,
-                    textAlign: TextAlign.center,
+                    'Event Created Successfully',
+                    style: AppTypography.titleMedium.copyWith(
+                      color: Colors.black,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    'Event Created Successfully',
-                    style: AppTypography.bodyMedium.copyWith(
+                    event.name,
+                    style: AppTypography.bodyLarge.copyWith(
                       color: AppColors.textLight,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -1003,7 +1005,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
             // Share Section
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.all(24.w),
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1016,11 +1018,17 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                       ),
                       child: Row(
                         children: [
+                          Icon(
+                            CupertinoIcons.link,
+                            size: 20.sp,
+                            color: AppColors.textLight,
+                          ),
+                          SizedBox(width: 12.w),
                           Expanded(
                             child: Text(
                               'events.app/e/${event.id}',
                               style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.textLight,
+                                color: Colors.black,
                               ),
                             ),
                           ),
@@ -1040,12 +1048,14 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 32.h),
 
                     // Share Options
                     Text(
                       'Share via',
-                      style: AppTypography.titleSmall,
+                      style: AppTypography.titleSmall.copyWith(
+                        color: Colors.black,
+                      ),
                     ),
                     SizedBox(height: 16.h),
                     Row(
@@ -1055,41 +1065,31 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                           icon: CupertinoIcons.chat_bubble_fill,
                           label: 'WhatsApp',
                           color: const Color(0xFF25D366),
-                          onTap: () {
-                            // TODO: Implement WhatsApp share
-                          },
+                          onTap: () => _shareViaWhatsApp(event),
                         ),
                         _buildShareOption(
                           icon: CupertinoIcons.camera_fill,
                           label: 'Instagram',
                           color: const Color(0xFFE4405F),
-                          onTap: () {
-                            // TODO: Implement Instagram share
-                          },
+                          onTap: () => _shareViaInstagram(event),
                         ),
                         _buildShareOption(
                           icon: CupertinoIcons.at,
                           label: 'X',
                           color: Colors.black,
-                          onTap: () {
-                            // TODO: Implement X share
-                          },
+                          onTap: () => _shareViaX(event),
                         ),
                         _buildShareOption(
                           icon: CupertinoIcons.person_2_fill,
                           label: 'Facebook',
                           color: const Color(0xFF1877F2),
-                          onTap: () {
-                            // TODO: Implement Facebook share
-                          },
+                          onTap: () => _shareViaFacebook(event),
                         ),
                         _buildShareOption(
                           icon: CupertinoIcons.mail_solid,
                           label: 'Email',
                           color: AppColors.textLight,
-                          onTap: () {
-                            // TODO: Implement email share
-                          },
+                          onTap: () => _shareViaEmail(event),
                         ),
                       ],
                     ),
@@ -1102,9 +1102,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(12.r),
-                        onPressed: () {
-                          // TODO: Implement native share
-                        },
+                        onPressed: () => _shareNative(event),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -1158,14 +1156,66 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
     );
   }
 
+  void _shareViaWhatsApp(Event event) {
+    final url = 'events.app/e/${event.id}';
+    final message = 'Join me at ${event.name}! $url';
+    // TODO: Implement WhatsApp share using url_launcher
+  }
+
+  void _shareViaInstagram(Event event) {
+    final url = 'events.app/e/${event.id}';
+    // TODO: Implement Instagram share using url_launcher
+  }
+
+  void _shareViaX(Event event) {
+    final url = 'events.app/e/${event.id}';
+    final message = 'Join me at ${event.name}! $url';
+    // TODO: Implement X share using url_launcher
+  }
+
+  void _shareViaFacebook(Event event) {
+    final url = 'events.app/e/${event.id}';
+    // TODO: Implement Facebook share using url_launcher
+  }
+
+  void _shareViaEmail(Event event) {
+    final url = 'events.app/e/${event.id}';
+    final subject = 'Join me at ${event.name}!';
+    final body =
+        'I\'d like to invite you to ${event.name}.\n\nEvent details: $url';
+    // TODO: Implement email share using url_launcher
+  }
+
+  void _shareNative(Event event) {
+    final url = 'events.app/e/${event.id}';
+    final message = 'Join me at ${event.name}! $url';
+    // TODO: Implement native share using share_plus package
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.month}/${date.day}/${date.year}';
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${_formatDate(dateTime)} ${_formatTime(TimeOfDay.fromDateTime(dateTime))}';
+  }
+
   Widget _buildShareOption({
     required IconData icon,
     required String label,
     required Color color,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: onTap,
       child: Column(
         children: [
           Container(
@@ -1191,20 +1241,5 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.month}/${date.day}/${date.year}';
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hourOfPeriod;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '$hour:$minute $period';
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    return '${_formatDate(dateTime)} ${_formatTime(TimeOfDay.fromDateTime(dateTime))}';
   }
 }
