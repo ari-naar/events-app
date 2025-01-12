@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../core/models/event.dart';
@@ -1156,40 +1159,272 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
     );
   }
 
-  void _shareViaWhatsApp(Event event) {
-    final url = 'events.app/e/${event.id}';
-    final message = 'Join me at ${event.name}! $url';
-    // TODO: Implement WhatsApp share using url_launcher
+  Widget _buildShareOption({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 200),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              // Add tap animation
+              HapticFeedback.lightImpact();
+              _animateShareButton(context, onTap);
+            },
+            child: Column(
+              children: [
+                Container(
+                  width: 48.w,
+                  height: 48.w,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: color,
+                    size: 24.sp,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  label,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  void _shareViaInstagram(Event event) {
-    final url = 'events.app/e/${event.id}';
-    // TODO: Implement Instagram share using url_launcher
+  void _animateShareButton(BuildContext context, VoidCallback onTap) {
+    // Scale animation on tap
+    TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1.0, end: 0.9),
+      duration: const Duration(milliseconds: 100),
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: child,
+        );
+      },
+      onEnd: () {
+        onTap();
+      },
+    );
   }
 
-  void _shareViaX(Event event) {
-    final url = 'events.app/e/${event.id}';
-    final message = 'Join me at ${event.name}! $url';
-    // TODO: Implement X share using url_launcher
+  String _formatEventDetails(Event event) {
+    final buffer = StringBuffer();
+    buffer.writeln('🎉 ${event.name}');
+    buffer.writeln('📅 ${_formatDateTime(event.date)}');
+    buffer.writeln('📍 ${event.location}');
+
+    if (event.maxParticipants != null) {
+      buffer.writeln('👥 Limited to ${event.maxParticipants} participants');
+    }
+
+    if (event.minAge != null || event.maxAge != null) {
+      final ageRange = [
+        if (event.minAge != null) '${event.minAge}+',
+        if (event.maxAge != null) 'up to ${event.maxAge}',
+      ].join(' ');
+      buffer.writeln('🔞 Age range: $ageRange');
+    }
+
+    return buffer.toString();
   }
 
-  void _shareViaFacebook(Event event) {
-    final url = 'events.app/e/${event.id}';
-    // TODO: Implement Facebook share using url_launcher
+  Future<void> _shareViaWhatsApp(Event event) async {
+    try {
+      final url = 'events.app/e/${event.id}';
+      final message = _formatEventDetails(event);
+      final whatsappUrl = Uri.parse(
+        'whatsapp://send?text=${Uri.encodeComponent('$message\n\nJoin here: $url')}',
+      );
+
+      if (await canLaunchUrl(whatsappUrl)) {
+        await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch WhatsApp';
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('WhatsApp Not Found'),
+          content: const Text(
+              'Please make sure WhatsApp is installed on your device.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
-  void _shareViaEmail(Event event) {
-    final url = 'events.app/e/${event.id}';
-    final subject = 'Join me at ${event.name}!';
-    final body =
-        'I\'d like to invite you to ${event.name}.\n\nEvent details: $url';
-    // TODO: Implement email share using url_launcher
+  Future<void> _shareViaInstagram(Event event) async {
+    try {
+      final url = 'events.app/e/${event.id}';
+      final instagramUrl = Uri.parse('instagram://share');
+
+      if (await canLaunchUrl(instagramUrl)) {
+        await launchUrl(instagramUrl, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch Instagram';
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('Instagram Not Found'),
+          content: const Text(
+              'Please make sure Instagram is installed on your device.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
-  void _shareNative(Event event) {
-    final url = 'events.app/e/${event.id}';
-    final message = 'Join me at ${event.name}! $url';
-    // TODO: Implement native share using share_plus package
+  Future<void> _shareViaX(Event event) async {
+    try {
+      final url = 'events.app/e/${event.id}';
+      final message = _formatEventDetails(event);
+      final twitterUrl = Uri.parse(
+        'https://twitter.com/intent/tweet?text=${Uri.encodeComponent('$message\n\nJoin here: $url')}',
+      );
+
+      if (await canLaunchUrl(twitterUrl)) {
+        await launchUrl(twitterUrl, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch X';
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('Browser Not Found'),
+          content: const Text('Unable to open X. Please try again later.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> _shareViaFacebook(Event event) async {
+    try {
+      final url = 'events.app/e/${event.id}';
+      final facebookUrl = Uri.parse(
+        'https://www.facebook.com/sharer/sharer.php?u=${Uri.encodeComponent(url)}',
+      );
+
+      if (await canLaunchUrl(facebookUrl)) {
+        await launchUrl(facebookUrl, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch Facebook';
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('Browser Not Found'),
+          content:
+              const Text('Unable to open Facebook. Please try again later.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> _shareViaEmail(Event event) async {
+    try {
+      final url = 'events.app/e/${event.id}';
+      final message = _formatEventDetails(event);
+      final subject = Uri.encodeComponent('Join me at ${event.name}!');
+      final body = Uri.encodeComponent('$message\n\nJoin here: $url');
+      final emailUrl = Uri.parse('mailto:?subject=$subject&body=$body');
+
+      if (await canLaunchUrl(emailUrl)) {
+        await launchUrl(emailUrl, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch email';
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('Email Not Found'),
+          content: const Text('Unable to open email. Please try again later.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> _shareNative(Event event) async {
+    try {
+      final url = 'events.app/e/${event.id}';
+      final message = _formatEventDetails(event);
+      await Share.share(
+        '$message\n\nJoin here: $url',
+        subject: 'Join me at ${event.name}!',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('Sharing Failed'),
+          content: const Text(
+              'Unable to share at this time. Please try again later.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   String _formatDate(DateTime date) {
@@ -1205,41 +1440,5 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
 
   String _formatDateTime(DateTime dateTime) {
     return '${_formatDate(dateTime)} ${_formatTime(TimeOfDay.fromDateTime(dateTime))}';
-  }
-
-  Widget _buildShareOption({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return CupertinoButton(
-      padding: EdgeInsets.zero,
-      onPressed: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 48.w,
-            height: 48.w,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 24.sp,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            label,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textLight,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
