@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../core/models/event.dart';
+import 'age_range_sheet.dart';
+import 'notification_settings_sheet.dart';
+import 'recurring_options_sheet.dart';
 
 class CreateEventBottomSheet extends StatefulWidget {
   const CreateEventBottomSheet({super.key});
 
-  static Future<void> show(BuildContext context) {
-    return showModalBottomSheet(
+  static Future<Event?> show(BuildContext context) {
+    return showModalBottomSheet<Event>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -22,14 +26,27 @@ class CreateEventBottomSheet extends StatefulWidget {
 
 class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   final _formKey = GlobalKey<FormState>();
-  DateTime _selectedDate = DateTime.now();
-  TimeOfDay _selectedTime = TimeOfDay.now();
-  DateTime _selectedCutoffDate = DateTime.now();
-  TimeOfDay _selectedCutoffTime = TimeOfDay.now();
-  bool _isRecurring = false;
-  RangeValues _ageRange = const RangeValues(18, 100);
-  int _minPeople = 1;
-  int _maxPeople = 10;
+  final _nameController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  DateTime _date = DateTime.now().add(const Duration(days: 1));
+  TimeOfDay _time = const TimeOfDay(hour: 18, minute: 0);
+  int _minParticipants = 2;
+  int _maxParticipants = 10;
+  DateTime _responseCutoff = DateTime.now();
+  bool _hasWaitlist = false;
+  RecurringType? _recurringType;
+  NotificationSettings _notificationSettings = const NotificationSettings();
+  AgeRange _ageRange = const AgeRange();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _locationController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,20 +60,28 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
         children: [
           _buildHeader(),
           Expanded(
-            child: CupertinoScrollbar(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Form(
-                  key: _formKey,
+            child: Form(
+              key: _formKey,
+              child: CupertinoScrollbar(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildEventBasics(),
-                      _buildDateTimeSection(),
-                      _buildLocationSection(),
+                      _buildBasicInfoSection(),
+                      SizedBox(height: 24.h),
                       _buildParticipantsSection(),
+                      SizedBox(height: 24.h),
                       _buildResponseSection(),
-                      _buildSettingsSection(),
+                      SizedBox(height: 24.h),
+                      _buildRecurringSection(),
+                      SizedBox(height: 24.h),
+                      _buildNotificationsSection(),
+                      SizedBox(height: 24.h),
+                      _buildAgeRangeSection(),
+                      SizedBox(height: 32.h),
+                      _buildCreateButton(),
+                      SizedBox(height: 16.h),
                     ],
                   ),
                 ),
@@ -96,12 +121,12 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
             ),
           ),
           Text(
-            'New Event',
+            'Create Event',
             style: AppTypography.titleMedium,
           ),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: _handleSubmit,
+            onPressed: _submitForm,
             child: Text(
               'Create',
               style: AppTypography.bodyMedium.copyWith(
@@ -115,200 +140,15 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
     );
   }
 
-  Widget _buildEventBasics() {
+  Widget _buildBasicInfoSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 16.h),
-        CupertinoTextField(
-          placeholder: 'Event Name',
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(8.r),
-          ),
+        Text(
+          'Basic Information',
+          style: AppTypography.titleSmall,
         ),
-        SizedBox(height: 24.h),
-      ],
-    );
-  }
-
-  Widget _buildDateTimeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Date & Time', style: AppTypography.titleSmall),
-        SizedBox(height: 12.h),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Column(
-            children: [
-              _buildDateTimeTile(
-                'Date',
-                '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                onTap: () => _showDatePicker(context),
-              ),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
-              _buildDateTimeTile(
-                'Time',
-                _selectedTime.format(context),
-                onTap: () => _showTimePicker(context),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 24.h),
-      ],
-    );
-  }
-
-  Widget _buildLocationSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Location', style: AppTypography.titleSmall),
-        SizedBox(height: 12.h),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: CupertinoButton(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            onPressed: () {
-              // TODO: Implement location picker
-            },
-            child: Row(
-              children: [
-                Icon(
-                  CupertinoIcons.location,
-                  color: AppColors.textLight,
-                  size: 20.sp,
-                ),
-                SizedBox(width: 12.w),
-                Text(
-                  'Add Location',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textLight,
-                  ),
-                ),
-                const Spacer(),
-                Icon(
-                  CupertinoIcons.chevron_right,
-                  color: AppColors.textLight,
-                  size: 16.sp,
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(height: 24.h),
-      ],
-    );
-  }
-
-  Widget _buildParticipantsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Participants', style: AppTypography.titleSmall),
-        SizedBox(height: 12.h),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Minimum', style: AppTypography.bodyMedium),
-                  SizedBox(
-                    width: 100.w,
-                    child: CupertinoTextField(
-                      controller:
-                          TextEditingController(text: _minPeople.toString()),
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 12.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Maximum', style: AppTypography.bodyMedium),
-                  SizedBox(
-                    width: 100.w,
-                    child: CupertinoTextField(
-                      controller:
-                          TextEditingController(text: _maxPeople.toString()),
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.background,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 24.h),
-      ],
-    );
-  }
-
-  Widget _buildResponseSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Response Settings', style: AppTypography.titleSmall),
-        SizedBox(height: 12.h),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          child: Column(
-            children: [
-              _buildDateTimeTile(
-                'Cutoff Date',
-                '${_selectedCutoffDate.day}/${_selectedCutoffDate.month}/${_selectedCutoffDate.year}',
-                onTap: () => _showCutoffDatePicker(context),
-              ),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
-              _buildDateTimeTile(
-                'Cutoff Time',
-                _selectedCutoffTime.format(context),
-                onTap: () => _showCutoffTimePicker(context),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 24.h),
-      ],
-    );
-  }
-
-  Widget _buildSettingsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Additional Settings', style: AppTypography.titleSmall),
-        SizedBox(height: 12.h),
+        SizedBox(height: 8.h),
         Container(
           decoration: BoxDecoration(
             color: AppColors.surface,
@@ -318,182 +158,506 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Event Name',
+                    border: InputBorder.none,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an event name';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              CupertinoButton(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                onPressed: _showDatePicker,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Recurring Event', style: AppTypography.bodyMedium),
+                    Text(
+                      'Date',
+                      style: AppTypography.bodyMedium,
+                    ),
+                    Text(
+                      _formatDate(_date),
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              CupertinoButton(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                onPressed: _showTimePicker,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Time',
+                      style: AppTypography.bodyMedium,
+                    ),
+                    Text(
+                      _formatTime(_time),
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: TextFormField(
+                  controller: _locationController,
+                  decoration: const InputDecoration(
+                    labelText: 'Location',
+                    border: InputBorder.none,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a location';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: InputBorder.none,
+                  ),
+                  maxLines: 3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildParticipantsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Participants',
+          style: AppTypography.titleSmall,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Column(
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                onPressed: () => _showParticipantsPicker(isMin: true),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Minimum Participants',
+                      style: AppTypography.bodyMedium,
+                    ),
+                    Text(
+                      '$_minParticipants',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              CupertinoButton(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                onPressed: () => _showParticipantsPicker(isMin: false),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Maximum Participants',
+                      style: AppTypography.bodyMedium,
+                    ),
+                    Text(
+                      '$_maxParticipants',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Enable Waitlist',
+                      style: AppTypography.bodyMedium,
+                    ),
                     CupertinoSwitch(
-                      value: _isRecurring,
-                      onChanged: (value) =>
-                          setState(() => _isRecurring = value),
+                      value: _hasWaitlist,
+                      onChanged: (value) {
+                        setState(() {
+                          _hasWaitlist = value;
+                        });
+                      },
                       activeColor: AppColors.accent,
                     ),
                   ],
                 ),
               ),
-              if (_isRecurring) ...[
-                Divider(
-                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
-                _buildDateTimeTile(
-                  'Repeat',
-                  'Weekly',
-                  onTap: () {
-                    // TODO: Implement repeat options
-                  },
-                ),
-              ],
             ],
           ),
         ),
-        SizedBox(height: 32.h),
       ],
     );
   }
 
-  Widget _buildDateTimeTile(String title, String value,
-      {required VoidCallback onTap}) {
-    return CupertinoButton(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      onPressed: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: AppTypography.bodyMedium),
-          Row(
-            children: [
-              Text(
-                value,
-                style: AppTypography.bodyMedium.copyWith(
+  Widget _buildResponseSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Response',
+          style: AppTypography.titleSmall,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: CupertinoButton(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            onPressed: _showResponseCutoffPicker,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Response Cutoff',
+                  style: AppTypography.bodyMedium,
+                ),
+                Text(
+                  _formatDateTime(_responseCutoff),
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecurringSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Recurring',
+          style: AppTypography.titleSmall,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: CupertinoButton(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            onPressed: _showRecurringOptions,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Repeat',
+                  style: AppTypography.bodyMedium,
+                ),
+                Text(
+                  _recurringType?.label ?? 'Never',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNotificationsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Notifications',
+          style: AppTypography.titleSmall,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: CupertinoButton(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            onPressed: _showNotificationSettings,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Notification Settings',
+                  style: AppTypography.bodyMedium,
+                ),
+                Icon(
+                  CupertinoIcons.right_chevron,
+                  size: 20.sp,
                   color: AppColors.textLight,
                 ),
-              ),
-              SizedBox(width: 8.w),
-              Icon(
-                CupertinoIcons.chevron_right,
-                color: AppColors.textLight,
-                size: 16.sp,
-              ),
-            ],
+              ],
+            ),
           ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAgeRangeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Age Range',
+          style: AppTypography.titleSmall,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: CupertinoButton(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            onPressed: _showAgeRangePicker,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Age Limits',
+                  style: AppTypography.bodyMedium,
+                ),
+                Text(
+                  '${_ageRange.minAge} - ${_ageRange.maxAge} years',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCreateButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _submitForm,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.accent,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 16.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+        ),
+        child: Text(
+          'Create Event',
+          style: AppTypography.titleSmall.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
 
-  Future<void> _showDatePicker(BuildContext context) async {
-    await showCupertinoModalPopup(
+  void _showDatePicker() async {
+    final picked = await showDatePicker(
       context: context,
-      builder: (context) => Container(
-        height: 216.h,
-        padding: EdgeInsets.only(top: 6.h),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: CupertinoDatePicker(
-            initialDateTime: _selectedDate,
-            mode: CupertinoDatePickerMode.date,
-            onDateTimeChanged: (DateTime newDate) {
-              setState(() => _selectedDate = newDate);
-            },
-          ),
-        ),
-      ),
+      initialDate: _date,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-  }
-
-  Future<void> _showTimePicker(BuildContext context) async {
-    await showCupertinoModalPopup(
-      context: context,
-      builder: (context) => Container(
-        height: 216.h,
-        padding: EdgeInsets.only(top: 6.h),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: CupertinoDatePicker(
-            initialDateTime: DateTime.now().applied(_selectedTime),
-            mode: CupertinoDatePickerMode.time,
-            onDateTimeChanged: (DateTime newDateTime) {
-              setState(
-                  () => _selectedTime = TimeOfDay.fromDateTime(newDateTime));
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showCutoffDatePicker(BuildContext context) async {
-    await showCupertinoModalPopup(
-      context: context,
-      builder: (context) => Container(
-        height: 216.h,
-        padding: EdgeInsets.only(top: 6.h),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: CupertinoDatePicker(
-            initialDateTime: _selectedCutoffDate,
-            mode: CupertinoDatePickerMode.date,
-            onDateTimeChanged: (DateTime newDate) {
-              setState(() => _selectedCutoffDate = newDate);
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showCutoffTimePicker(BuildContext context) async {
-    await showCupertinoModalPopup(
-      context: context,
-      builder: (context) => Container(
-        height: 216.h,
-        padding: EdgeInsets.only(top: 6.h),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: CupertinoDatePicker(
-            initialDateTime: DateTime.now().applied(_selectedCutoffTime),
-            mode: CupertinoDatePickerMode.time,
-            onDateTimeChanged: (DateTime newDateTime) {
-              setState(() =>
-                  _selectedCutoffTime = TimeOfDay.fromDateTime(newDateTime));
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _handleSubmit() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // TODO: Handle event creation
-      Navigator.pop(context);
+    if (picked != null) {
+      setState(() {
+        _date = DateTime(
+          picked.year,
+          picked.month,
+          picked.day,
+          _time.hour,
+          _time.minute,
+        );
+      });
     }
   }
-}
 
-extension on DateTime {
-  DateTime applied(TimeOfDay time) {
-    return DateTime(
-      year,
-      month,
-      day,
-      time.hour,
-      time.minute,
+  void _showTimePicker() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _time,
     );
+    if (picked != null) {
+      setState(() {
+        _time = picked;
+        _date = DateTime(
+          _date.year,
+          _date.month,
+          _date.day,
+          picked.hour,
+          picked.minute,
+        );
+      });
+    }
+  }
+
+  void _showParticipantsPicker({required bool isMin}) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        height: 200.h,
+        color: AppColors.background,
+        child: CupertinoPicker(
+          itemExtent: 32.h,
+          scrollController: FixedExtentScrollController(
+            initialItem: isMin ? _minParticipants - 1 : _maxParticipants - 1,
+          ),
+          onSelectedItemChanged: (index) {
+            setState(() {
+              if (isMin) {
+                _minParticipants = index + 1;
+                if (_minParticipants > _maxParticipants) {
+                  _maxParticipants = _minParticipants;
+                }
+              } else {
+                _maxParticipants = index + 1;
+                if (_maxParticipants < _minParticipants) {
+                  _minParticipants = _maxParticipants;
+                }
+              }
+            });
+          },
+          children: List.generate(
+            100,
+            (index) => Center(child: Text('${index + 1}')),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showResponseCutoffPicker() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _responseCutoff,
+      firstDate: DateTime.now(),
+      lastDate: _date,
+    );
+    if (picked != null) {
+      setState(() {
+        _responseCutoff = picked;
+      });
+    }
+  }
+
+  void _showRecurringOptions() async {
+    final type = await RecurringOptionsSheet.show(context);
+    if (type != null) {
+      setState(() {
+        _recurringType = type;
+      });
+    }
+  }
+
+  void _showNotificationSettings() async {
+    final settings = await NotificationSettingsSheet.show(
+      context,
+      initialSettings: _notificationSettings,
+    );
+    if (settings != null) {
+      setState(() {
+        _notificationSettings = settings;
+      });
+    }
+  }
+
+  void _showAgeRangePicker() async {
+    final range = await AgeRangeSheet.show(
+      context,
+      initialRange: _ageRange,
+    );
+    if (range != null) {
+      setState(() {
+        _ageRange = range;
+      });
+    }
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState?.validate() ?? false) {
+      final event = Event(
+        id: '', // Will be generated by the backend
+        name: _nameController.text,
+        date: _date,
+        location: _locationController.text,
+        minParticipants: _minParticipants,
+        maxParticipants: _maxParticipants,
+        responseCutoff: _responseCutoff,
+        hasWaitlist: _hasWaitlist,
+        participants: const [],
+        waitlist: const [],
+      );
+      Navigator.pop(context, event);
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.month}/${date.day}/${date.year}';
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${_formatDate(dateTime)} ${_formatTime(TimeOfDay.fromDateTime(dateTime))}';
   }
 }
