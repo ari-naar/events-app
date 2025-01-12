@@ -6,7 +6,7 @@
 - Service interfaces (Auth, Event, Notification)
 - Screen layouts:
   - Authentication screens (Login, Signup)
-  - Event screens (List, Details, Create)
+  - Event screens (List, Details)
   - Profile screen
   - Notifications screen
 - Theme Implementation:
@@ -17,6 +17,17 @@
   - Custom bottom navigation bar
   - Icon-only design with active states
   - Screen navigation setup
+- Custom Components:
+  - Custom text field with validation
+  - Custom button with primary/secondary styles
+- Event Creation:
+  - Modal bottom sheet implementation
+  - Basic event details form
+  - Date and time pickers
+  - Participant limits
+  - Response cutoff settings
+  - Age range selector
+  - Recurring event toggle
 
 ## In Progress
 - [ ] Asset Integration
@@ -24,16 +35,17 @@
   - App icons and splash screen
   - Font implementation (Inter)
 
+- [ ] Event Creation Flow
+  - Form validation
+  - Event creation service integration
+  - Location selection
+  - Notification settings
+  - Admin management
+
 - [ ] Authentication Implementation
   - Email signup/login flow
   - User session management
   - Password reset functionality
-
-- [ ] Event Management
-  - Event creation form
-  - Event listing and filtering
-  - Event details view
-  - Response handling
 
 ## Next Up
 - [ ] Search Functionality

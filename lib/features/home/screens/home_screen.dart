@@ -17,9 +17,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const Center(child: Text('Home Feed')), // Home screen
     const Center(child: Text('Search')), // Search screen
-    const CreateEventScreen(), // Create Event screen
-    const EventListScreen(), // Events screen
-    const ProfileScreen(), // Profile screen
+    const Center(child: Text('Create Event')), // Create Event screen
+    const Center(child: Text('Events')), // Events screen
+    const Center(child: Text('Profile')), // Profile screen
   ];
 
   void _onItemTapped(int index) {
