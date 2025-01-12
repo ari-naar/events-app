@@ -502,6 +502,56 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
   }
 
   Widget _buildLocationSection(BuildContext context) {
+    if (widget.event.location.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Location',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                  ),
+            ),
+            SizedBox(height: 16.h),
+            Container(
+              height: 200.h,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      CupertinoIcons.location_slash_fill,
+                      size: 48.sp,
+                      color: AppColors.textLight,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'No location specified',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: AppColors.textLight,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
