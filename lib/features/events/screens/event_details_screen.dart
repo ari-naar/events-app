@@ -5,17 +5,57 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../core/models/event.dart';
 import '../../../core/models/event_category.dart';
+import 'event_analytics_screen.dart';
 
-class EventDetailsScreen extends StatelessWidget {
+class EventDetailsScreen extends StatefulWidget {
   final Event event;
 
   const EventDetailsScreen({super.key, required this.event});
+
+  @override
+  State<EventDetailsScreen> createState() => _EventDetailsScreenState();
+}
+
+class _EventDetailsScreenState extends State<EventDetailsScreen>
+    with SingleTickerProviderStateMixin {
+  late ScrollController _scrollController;
+  late AnimationController _animationController;
+  bool _showTitle = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()
+      ..addListener(() {
+        bool shouldShowTitle = _scrollController.offset > 200.h;
+        if (shouldShowTitle != _showTitle) {
+          setState(() => _showTitle = shouldShowTitle);
+          if (shouldShowTitle) {
+            _animationController.forward();
+          } else {
+            _animationController.reverse();
+          }
+        }
+      });
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       backgroundColor: AppColors.background,
       child: CustomScrollView(
+        controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           _buildSliverHeader(context),
@@ -50,20 +90,36 @@ class EventDetailsScreen extends StatelessWidget {
       pinned: true,
       stretch: true,
       backgroundColor: AppColors.background,
+      centerTitle: true,
+      title: FadeTransition(
+        opacity: _animationController,
+        child: Text(
+          widget.event.name,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
       leading: Material(
         color: Colors.transparent,
         child: IconButton(
-          icon: Container(
+          icon: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.95),
+              color: Colors.white.withOpacity(_showTitle ? 0 : 0.95),
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
+                if (!_showTitle)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
               ],
             ),
             child: Icon(
@@ -79,17 +135,54 @@ class EventDetailsScreen extends StatelessWidget {
         Material(
           color: Colors.transparent,
           child: IconButton(
-            icon: Container(
+            icon: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
+                color: Colors.white.withOpacity(_showTitle ? 0 : 0.95),
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
+                  if (!_showTitle)
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                ],
+              ),
+              child: Icon(
+                CupertinoIcons.chart_bar_alt_fill,
+                color: AppColors.textPrimary,
+                size: 18.sp,
+              ),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) =>
+                      EventAnalyticsScreen(event: widget.event),
+                ),
+              );
+            },
+          ),
+        ),
+        Material(
+          color: Colors.transparent,
+          child: IconButton(
+            icon: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(_showTitle ? 0 : 0.95),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  if (!_showTitle)
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
                 ],
               ),
               child: Icon(
@@ -109,54 +202,60 @@ class EventDetailsScreen extends StatelessWidget {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
-              event.category?.image ?? EventCategory.other.image,
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Container(
-                  color: event.category?.color.withOpacity(0.1) ??
-                      AppColors.surface,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        event.category?.color ?? AppColors.accent,
+            Hero(
+              tag: 'event_image_${widget.event.id}',
+              child: Image.network(
+                widget.event.category?.image ?? EventCategory.other.image,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: widget.event.category?.color.withOpacity(0.1) ??
+                        AppColors.surface,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          widget.event.category?.color ?? AppColors.accent,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: event.category?.color.withOpacity(0.1) ??
-                      AppColors.surface,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          event.category?.icon ?? Icons.category,
-                          size: 48.sp,
-                          color: event.category?.color ?? AppColors.textLight,
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          event.category?.label ?? 'Event',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: event.category?.color ??
-                                        AppColors.textLight,
-                                  ),
-                        ),
-                      ],
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: widget.event.category?.color.withOpacity(0.1) ??
+                        AppColors.surface,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            widget.event.category?.icon ?? Icons.category,
+                            size: 48.sp,
+                            color: widget.event.category?.color ??
+                                AppColors.textLight,
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            widget.event.category?.label ?? 'Event',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: widget.event.category?.color ??
+                                      AppColors.textLight,
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
             Container(
               decoration: BoxDecoration(
@@ -177,27 +276,46 @@ class EventDetailsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 6.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: event.category?.color.withOpacity(0.9) ??
-                          EventCategory.other.color.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Text(
-                      event.category?.label ?? 'Other',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              widget.event.category?.color.withOpacity(0.9) ??
+                                  EventCategory.other.color.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              widget.event.category?.icon ?? Icons.category,
+                              size: 16.sp,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 6.w),
+                            Text(
+                              widget.event.category?.label ?? 'Other',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 8.h),
                   Text(
-                    event.name,
+                    widget.event.name,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
@@ -225,15 +343,15 @@ class EventDetailsScreen extends StatelessWidget {
             context,
             icon: CupertinoIcons.calendar,
             title: 'Date & Time',
-            value: _formatDateTime(event.date),
+            value: _formatDateTime(widget.event.date),
           ),
-          if (event.responseCutoff != null) ...[
+          if (widget.event.responseCutoff != null) ...[
             Divider(height: 20.h),
             _buildInfoRow(
               context,
               icon: CupertinoIcons.time,
               title: 'Response Cutoff',
-              value: _formatDateTime(event.responseCutoff!),
+              value: _formatDateTime(widget.event.responseCutoff!),
             ),
           ],
         ],
@@ -260,7 +378,7 @@ class EventDetailsScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
               ),
-              if (event.maxParticipants != null)
+              if (widget.event.maxParticipants != null)
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 12.w,
@@ -271,7 +389,7 @@ class EventDetailsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    '${event.participants.length}/${event.maxParticipants}',
+                    '${widget.event.participants.length}/${widget.event.maxParticipants}',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                           color: AppColors.accent,
                           fontWeight: FontWeight.w600,
@@ -285,16 +403,16 @@ class EventDetailsScreen extends StatelessWidget {
             children: [
               _buildParticipantCount(
                 context,
-                count: event.participants.length,
-                total: event.maxParticipants,
+                count: widget.event.participants.length,
+                total: widget.event.maxParticipants,
                 label: 'Going',
                 color: AppColors.success,
               ),
-              if (event.hasWaitlist) ...[
+              if (widget.event.hasWaitlist) ...[
                 SizedBox(width: 24.w),
                 _buildParticipantCount(
                   context,
-                  count: event.waitlist.length,
+                  count: widget.event.waitlist.length,
                   label: 'Waitlist',
                   color: AppColors.warning,
                 ),
@@ -307,9 +425,9 @@ class EventDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDetailsSection(BuildContext context) {
-    if (!(event.description?.isNotEmpty ?? false) &&
-        event.minAge == null &&
-        event.maxAge == null) {
+    if (!(widget.event.description?.isNotEmpty ?? false) &&
+        widget.event.minAge == null &&
+        widget.event.maxAge == null) {
       return const SizedBox.shrink();
     }
 
@@ -328,17 +446,17 @@ class EventDetailsScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
           ),
-          if (event.description?.isNotEmpty ?? false) ...[
+          if (widget.event.description?.isNotEmpty ?? false) ...[
             SizedBox(height: 12.h),
             Text(
-              event.description!,
+              widget.event.description!,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     height: 1.5,
                     color: AppColors.textSecondary,
                   ),
             ),
           ],
-          if (event.minAge != null || event.maxAge != null) ...[
+          if (widget.event.minAge != null || widget.event.maxAge != null) ...[
             SizedBox(height: 16.h),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
@@ -423,7 +541,7 @@ class EventDetailsScreen extends StatelessWidget {
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
-                  event.location,
+                  widget.event.location,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -454,33 +572,6 @@ class EventDetailsScreen extends StatelessWidget {
                             ),
                       ),
                     ),
-                    Positioned(
-                      right: 12.w,
-                      bottom: 12.h,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.accent,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.accent.withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            CupertinoIcons.location_fill,
-                            color: Colors.white,
-                            size: 18.sp,
-                          ),
-                          onPressed: () {
-                            // TODO: Implement directions
-                          },
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -492,8 +583,8 @@ class EventDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    final bool canJoin = event.maxParticipants == null ||
-        event.participants.length < (event.maxParticipants ?? 0);
+    final bool canJoin = widget.event.maxParticipants == null ||
+        widget.event.participants.length < (widget.event.maxParticipants ?? 0);
 
     return Column(
       children: [
@@ -517,7 +608,7 @@ class EventDetailsScreen extends StatelessWidget {
             ),
           ),
         ),
-        if (!canJoin && event.hasWaitlist) ...[
+        if (!canJoin && widget.event.hasWaitlist) ...[
           SizedBox(height: 12.h),
           SizedBox(
             width: double.infinity,
@@ -626,12 +717,12 @@ class EventDetailsScreen extends StatelessWidget {
   }
 
   String _formatAgeRange() {
-    if (event.minAge != null && event.maxAge != null) {
-      return '${event.minAge} - ${event.maxAge} years';
-    } else if (event.minAge != null) {
-      return '${event.minAge}+ years';
-    } else if (event.maxAge != null) {
-      return 'Up to ${event.maxAge} years';
+    if (widget.event.minAge != null && widget.event.maxAge != null) {
+      return '${widget.event.minAge} - ${widget.event.maxAge} years';
+    } else if (widget.event.minAge != null) {
+      return '${widget.event.minAge}+ years';
+    } else if (widget.event.maxAge != null) {
+      return 'Up to ${widget.event.maxAge} years';
     }
     return 'All ages';
   }
