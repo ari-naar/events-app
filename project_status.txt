@@ -20,6 +20,7 @@
 - Custom Components:
   - Custom text field with validation
   - Custom button with primary/secondary styles
+  - Event card with attendance chip
 - Event Creation:
   - Modal bottom sheet implementation
   - Basic event details form
@@ -28,12 +29,19 @@
   - Response cutoff settings
   - Age range selector
   - Recurring event toggle
+- Event List:
+  - Grid view layout
+  - Custom event cards
+  - Event preview with image
+  - Attendance display
+  - Basic event details display
 
 ## In Progress
 - [ ] Asset Integration
   - Custom icons for navigation
   - App icons and splash screen
   - Font implementation (Inter)
+  - Event placeholder images
 
 - [ ] Event Creation Flow
   - Form validation
@@ -41,6 +49,13 @@
   - Location selection
   - Notification settings
   - Admin management
+
+- [ ] Event List Features
+  - Event filtering
+  - Event search
+  - Pull to refresh
+  - Infinite scroll
+  - Loading states
 
 - [ ] Authentication Implementation
   - Email signup/login flow
