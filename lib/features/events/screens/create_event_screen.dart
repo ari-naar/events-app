@@ -302,6 +302,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   }
 
   void _showLocationPicker() async {
+    String tempLocation = _locationController.text;
     final location = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
@@ -321,7 +322,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                 children: [
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(context, ''),
                     child: Text(
                       'Cancel',
                       style: AppTypography.bodyMedium.copyWith(
@@ -335,8 +336,13 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                   ),
                   CupertinoButton(
                     padding: EdgeInsets.zero,
-                    onPressed: () =>
-                        Navigator.pop(context, _locationController.text),
+                    onPressed: () {
+                      if (tempLocation.trim().isEmpty) {
+                        Navigator.pop(context, '');
+                      } else {
+                        Navigator.pop(context, tempLocation);
+                      }
+                    },
                     child: Text(
                       'Done',
                       style: AppTypography.bodyMedium.copyWith(
@@ -351,12 +357,10 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: TextFormField(
                 autofocus: true,
-                onChanged: (value) {
-                  setState(() {
-                    _locationController.text = value;
-                  });
-                },
                 initialValue: _locationController.text,
+                onChanged: (value) {
+                  tempLocation = value;
+                },
                 decoration: InputDecoration(
                   hintText: 'Enter location',
                   prefixIcon: Icon(
@@ -939,8 +943,110 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
         minAge: _hasMinAge ? int.parse(_minAgeController.text) : null,
         maxAge: _hasMaxAge ? int.parse(_maxAgeController.text) : null,
       );
-      Navigator.pop(context, event);
+
+      // Show completion screen
+      _showCompletionScreen(event);
     }
+  }
+
+  void _showCompletionScreen(Event event) {
+    setState(() {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) => Container(
+          height: MediaQuery.of(context).size.height * 0.9,
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  children: [
+                    Icon(
+                      CupertinoIcons.check_mark_circled_solid,
+                      size: 64.sp,
+                      color: AppColors.success,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      'Event Created!',
+                      style: AppTypography.titleLarge,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      event.name,
+                      style: AppTypography.titleMedium.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                    SizedBox(height: 32.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildActionButton(
+                          icon: CupertinoIcons.share,
+                          label: 'Share',
+                          onTap: () {
+                            // TODO: Implement share functionality
+                          },
+                        ),
+                        SizedBox(width: 24.w),
+                        _buildActionButton(
+                          icon: CupertinoIcons.eye,
+                          label: 'View',
+                          onTap: () {
+                            Navigator.pop(context); // Close completion screen
+                            Navigator.pop(context,
+                                event); // Return event and close create screen
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 56.w,
+            height: 56.w,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16.r),
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.accent,
+              size: 24.sp,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            label,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textLight,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatDate(DateTime date) {
