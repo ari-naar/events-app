@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../core/models/event.dart';
@@ -56,20 +57,20 @@ class EventCard extends StatelessWidget {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.9),
+                      color: Colors.green.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.people,
+                          HugeIcons.strokeRoundedUserStatus,
                           size: 16.sp,
                           color: Colors.white,
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                          '${event.participants.length}/${event.maxParticipants}',
+                          'Attending',
                           style: AppTypography.bodySmall.copyWith(
                             color: Colors.white,
                           ),
