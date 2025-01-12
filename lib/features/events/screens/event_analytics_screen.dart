@@ -69,13 +69,13 @@ class _EventAnalyticsScreenState extends State<EventAnalyticsScreen>
                     children: [
                       _buildOverviewSection(context),
                       SizedBox(height: 24.h),
-                      _buildParticipationSection(context),
-                      SizedBox(height: 24.h),
                       _buildResponseSection(context),
                       SizedBox(height: 24.h),
                       if (widget.event.minAge != null ||
                           widget.event.maxAge != null)
                         _buildAgeDistributionSection(context),
+                      SizedBox(height: 24.h),
+                      _buildParticipationSection(context),
                     ],
                   ),
                 ),
@@ -512,147 +512,260 @@ class GenderDistributionPainter extends CustomPainter {
   }
 }
 
-class ParticipantDetailsSheet extends StatelessWidget {
+class ParticipantDetailsSheet extends StatefulWidget {
   final Event event;
 
   const ParticipantDetailsSheet({super.key, required this.event});
 
   @override
-  Widget build(BuildContext context) {
-    final int tabCount =
-        3 + (event.hasWaitlist ? 1 : 0); // Base tabs + waitlist if enabled
+  State<ParticipantDetailsSheet> createState() =>
+      _ParticipantDetailsSheetState();
+}
 
-    return Material(
-      color: AppColors.background,
-      child: CupertinoPageScaffold(
+class _ParticipantDetailsSheetState extends State<ParticipantDetailsSheet> {
+  int _selectedSegment = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<(String, int)> segments = [
+      ('All', widget.event.participants.length + widget.event.waitlist.length),
+      ('Going', widget.event.participants.length),
+      ('Declined', 0), // TODO: Add declined count
+      if (widget.event.hasWaitlist) ('Waitlist', widget.event.waitlist.length),
+    ];
+
+    return CupertinoPageScaffold(
+      backgroundColor: AppColors.background,
+      navigationBar: CupertinoNavigationBar(
         backgroundColor: AppColors.background,
-        navigationBar: CupertinoNavigationBar(
-          backgroundColor: AppColors.background,
-          border: null,
-          middle: Text(
-            'Participant Details',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+        border: null,
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            'Done',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: AppColors.accent,
                   fontWeight: FontWeight.w600,
                   height: 1.3,
                 ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ),
-        child: SafeArea(
-          child: DefaultTabController(
-            length: tabCount,
-            child: Column(
-              children: [
-                Material(
-                  color: AppColors.surface,
-                  child: TabBar(
-                    isScrollable: true,
-                    labelColor: AppColors.accent,
-                    unselectedLabelColor: AppColors.textLight,
-                    indicatorColor: AppColors.accent,
-                    tabs: [
-                      Tab(
-                          text:
-                              'All (${event.participants.length + event.waitlist.length})'),
-                      Tab(text: 'Going (${event.participants.length})'),
-                      Tab(text: 'Declined (0)'), // TODO: Add declined count
-                      if (event.hasWaitlist)
-                        Tab(text: 'Waitlist (${event.waitlist.length})'),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      _buildParticipantList(
-                          context, [...event.participants, ...event.waitlist]),
-                      _buildParticipantList(context, event.participants),
-                      _buildParticipantList(
-                          context, []), // TODO: Add declined list
-                      if (event.hasWaitlist)
-                        _buildParticipantList(context, event.waitlist),
-                    ],
-                  ),
-                ),
-              ],
+        middle: Text(
+          'Participants',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+              ),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: 44.h,
+              margin: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Row(
+                children: [
+                  for (int i = 0; i < segments.length; i++) ...[
+                    if (i > 0) SizedBox(width: 24.w),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _selectedSegment = i),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              segments[i].$1,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    color: _selectedSegment == i
+                                        ? AppColors.textPrimary
+                                        : AppColors.textLight,
+                                    fontWeight: _selectedSegment == i
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                    height: 1.3,
+                                  ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              segments[i].$2.toString(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
+                                    color: _selectedSegment == i
+                                        ? AppColors.accent
+                                        : AppColors.textLight.withOpacity(0.7),
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3,
+                                  ),
+                            ),
+                            SizedBox(height: 4.h),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              height: 2.h,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: _selectedSegment == i
+                                    ? AppColors.accent
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(1.r),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
-          ),
+            Container(
+              height: 1,
+              margin: EdgeInsets.only(top: 8.h),
+              color: AppColors.textLight.withOpacity(0.1),
+            ),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _buildParticipantList(
+                  context,
+                  _getParticipantsForSegment(_selectedSegment),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  List<String> _getParticipantsForSegment(int segment) {
+    switch (segment) {
+      case 0:
+        return [...widget.event.participants, ...widget.event.waitlist];
+      case 1:
+        return widget.event.participants;
+      case 2:
+        return []; // TODO: Add declined list
+      case 3:
+        return widget.event.hasWaitlist ? widget.event.waitlist : [];
+      default:
+        return [];
+    }
   }
 
   Widget _buildParticipantList(
       BuildContext context, List<String> participants) {
     if (participants.isEmpty) {
       return Center(
-        child: Text(
-          'No participants',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textLight,
-                height: 1.3,
-              ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.person_2_fill,
+              size: 48.sp,
+              color: AppColors.textLight.withOpacity(0.2),
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              'No participants yet',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppColors.textLight,
+                    height: 1.3,
+                  ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'Share the event to get people involved',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight.withOpacity(0.7),
+                    height: 1.3,
+                  ),
+            ),
+          ],
         ),
       );
     }
 
-    return Material(
-      color: AppColors.background,
-      child: ListView.separated(
-        padding: EdgeInsets.all(20.w),
-        itemCount: participants.length,
-        separatorBuilder: (context, index) => Divider(height: 20.h),
-        itemBuilder: (context, index) {
-          return Row(
-            children: [
-              Container(
-                width: 40.w,
-                height: 40.w,
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Icon(
-                    CupertinoIcons.person_fill,
-                    size: 20.sp,
-                    color: AppColors.accent,
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      itemCount: participants.length,
+      itemBuilder: (context, index) {
+        final bool isLast = index == participants.length - 1;
+        return Column(
+          children: [
+            CupertinoButton(
+              padding: EdgeInsets.symmetric(vertical: 8.h),
+              onPressed: () {
+                // TODO: Show participant details
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 48.w,
+                    height: 48.w,
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        CupertinoIcons.person_fill,
+                        size: 24.sp,
+                        color: AppColors.accent,
+                      ),
+                    ),
                   ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          participants[
+                              index], // TODO: Replace with actual user name
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3,
+                                  ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'user@example.com', // TODO: Replace with actual user email
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: AppColors.textLight,
+                                    height: 1.3,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    CupertinoIcons.chevron_right,
+                    size: 16.sp,
+                    color: AppColors.textLight,
+                  ),
+                ],
+              ),
+            ),
+            if (!isLast)
+              Padding(
+                padding: EdgeInsets.only(left: 64.w),
+                child: Divider(
+                  height: 1.h,
+                  color: AppColors.textLight.withOpacity(0.1),
                 ),
               ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      participants[
-                          index], // TODO: Replace with actual user name
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            height: 1.3,
-                          ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      'user@example.com', // TODO: Replace with actual user email
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.textLight,
-                            height: 1.3,
-                          ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+          ],
+        );
+      },
     );
   }
 }
