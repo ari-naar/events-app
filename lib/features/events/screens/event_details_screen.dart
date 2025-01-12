@@ -319,7 +319,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
+                          height: 1.2,
                         ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -444,15 +447,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
             'About',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  height: 1.3,
                 ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           if (widget.event.description?.isNotEmpty ?? false) ...[
             SizedBox(height: 12.h),
             Text(
               widget.event.description!,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    height: 1.5,
                     color: AppColors.textSecondary,
+                    height: 1.5,
                   ),
             ),
           ],
@@ -478,7 +484,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.accent,
                           fontWeight: FontWeight.w500,
+                          height: 1.3,
                         ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -506,7 +515,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                 'Location',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
+                      height: 1.3,
                     ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               CupertinoButton(
                 padding: EdgeInsets.zero,
@@ -518,7 +530,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: AppColors.accent,
                         fontWeight: FontWeight.w600,
+                        height: 1.3,
                       ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -544,7 +559,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                   widget.event.location,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textSecondary,
+                        height: 1.4,
                       ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ),
             ],
@@ -569,7 +587,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                         'Map',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: AppColors.textLight.withOpacity(0.2),
+                              height: 1.3,
                             ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -604,7 +625,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: canJoin ? Colors.white : AppColors.textLight,
                     fontWeight: FontWeight.w600,
+                    height: 1.3,
                   ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
@@ -624,7 +648,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: AppColors.accent,
                       fontWeight: FontWeight.w600,
+                      height: 1.3,
                     ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -655,14 +682,20 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                 title,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: AppColors.textLight,
+                      height: 1.3,
                     ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: 4.h),
               Text(
                 value,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w500,
+                      height: 1.3,
                     ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -693,7 +726,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: color,
                     fontWeight: FontWeight.w600,
+                    height: 1.3,
                   ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
@@ -702,7 +738,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: AppColors.textLight,
+                height: 1.3,
               ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
