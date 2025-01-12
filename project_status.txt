@@ -20,7 +20,10 @@
 - Custom Components:
   - Custom text field with validation
   - Custom button with primary/secondary styles
-  - Event card with attendance chip
+  - Event card with dynamic attendance display:
+    - Admin view: participant count
+    - User view: attendance status with color coding
+    - Status indicators (attending, not attending, waitlist, pending)
 - Event Creation:
   - Modal bottom sheet implementation
   - Basic event details form
@@ -33,7 +36,7 @@
   - Grid view layout
   - Custom event cards
   - Event preview with image
-  - Attendance display
+  - Role-based attendance display
   - Basic event details display
 
 ## In Progress
@@ -42,6 +45,7 @@
   - App icons and splash screen
   - Font implementation (Inter)
   - Event placeholder images
+  - HugeIcons integration
 
 - [ ] Event Creation Flow
   - Form validation
@@ -56,11 +60,13 @@
   - Pull to refresh
   - Infinite scroll
   - Loading states
+  - Response status management
 
 - [ ] Authentication Implementation
   - Email signup/login flow
   - User session management
   - Password reset functionality
+  - Role-based access control
 
 ## Next Up
 - [ ] Search Functionality

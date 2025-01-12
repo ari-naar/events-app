@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-enum ResponseStatus { attending, notAttending, waitlist, pending }
+enum ResponseStatus { attending, notAttending, maybe, waitlist, pending }
 
 class EventResponse {
   final String id;

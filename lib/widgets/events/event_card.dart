@@ -4,15 +4,20 @@ import 'package:hugeicons/hugeicons.dart';
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../core/models/event.dart';
+import '../../core/models/response.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
   final VoidCallback onTap;
+  final bool isAdmin;
+  final ResponseStatus? userResponseStatus;
 
   const EventCard({
     super.key,
     required this.event,
     required this.onTap,
+    this.isAdmin = false,
+    this.userResponseStatus,
   });
 
   @override
@@ -36,48 +41,20 @@ class EventCard extends StatelessWidget {
           children: [
             Stack(
               children: [
-                // Event Image
                 ClipRRect(
                   borderRadius:
                       BorderRadius.vertical(top: Radius.circular(16.r)),
                   child: Image.network(
-                    'https://picsum.photos/200', // Placeholder image
+                    'https://picsum.photos/200',
                     height: 120.h,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
                 ),
-                // Attendance Chip
                 Positioned(
                   top: 8.h,
                   left: 8.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          HugeIcons.strokeRoundedUserStatus,
-                          size: 16.sp,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          'Attending',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  child: _buildAttendanceChip(),
                 ),
               ],
             ),
@@ -96,7 +73,7 @@ class EventCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.calendar_today,
+                        HugeIcons.strokeRoundedCalendar01,
                         size: 16.sp,
                         color: AppColors.textLight,
                       ),
@@ -113,7 +90,7 @@ class EventCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.location_on,
+                        HugeIcons.strokeRoundedLocation05,
                         size: 16.sp,
                         color: AppColors.textLight,
                       ),
@@ -135,6 +112,100 @@ class EventCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAttendanceChip() {
+    if (isAdmin) {
+      return _buildAdminChip();
+    } else {
+      return _buildUserStatusChip();
+    }
+  }
+
+  Widget _buildAdminChip() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            HugeIcons.strokeRoundedUserStatus,
+            size: 16.sp,
+            color: Colors.white,
+          ),
+          SizedBox(width: 4.w),
+          Text(
+            '${event.participants.length}/${event.maxParticipants}',
+            style: AppTypography.bodySmall.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserStatusChip() {
+    Color chipColor;
+    String statusText;
+    IconData statusIcon;
+
+    switch (userResponseStatus) {
+      case ResponseStatus.attending:
+        chipColor = AppColors.success;
+        statusText = 'Attending';
+        statusIcon = HugeIcons.strokeRoundedCheckmarkCircle02;
+        break;
+      case ResponseStatus.notAttending:
+        chipColor = AppColors.error;
+        statusText = 'Not Attending';
+        statusIcon = HugeIcons.strokeRoundedCancelCircle;
+        break;
+      case ResponseStatus.maybe:
+        chipColor = AppColors.warning;
+        statusText = 'Maybe';
+        statusIcon = HugeIcons.strokeRoundedLoading01;
+        break;
+      case ResponseStatus.waitlist:
+        chipColor = AppColors.warning;
+        statusText = 'Waitlist';
+        statusIcon = HugeIcons.strokeRoundedLoading01;
+        break;
+      case ResponseStatus.pending:
+      default:
+        chipColor = AppColors.textLight;
+        statusText = 'Pending';
+        statusIcon = HugeIcons.strokeRoundedLoading01;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+      decoration: BoxDecoration(
+        color: chipColor.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            statusIcon,
+            size: 16.sp,
+            color: Colors.white,
+          ),
+          SizedBox(width: 4.w),
+          Text(
+            statusText,
+            style: AppTypography.bodySmall.copyWith(
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }
