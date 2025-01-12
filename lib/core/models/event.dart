@@ -1,10 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'event_category.dart';
 
 class Event {
   final String id;
   final String name;
   final DateTime date;
   final String location;
+  final String? description;
+  final EventCategory? category;
   final int? minParticipants;
   final int? maxParticipants;
   final DateTime responseCutoff;
@@ -14,17 +17,19 @@ class Event {
   final int? minAge;
   final int? maxAge;
 
-  Event({
+  const Event({
     required this.id,
     required this.name,
     required this.date,
     required this.location,
+    this.description,
+    this.category,
     this.minParticipants,
     this.maxParticipants,
     required this.responseCutoff,
-    this.hasWaitlist = false,
-    this.participants = const [],
-    this.waitlist = const [],
+    required this.hasWaitlist,
+    required this.participants,
+    required this.waitlist,
     this.minAge,
     this.maxAge,
   });
@@ -34,6 +39,8 @@ class Event {
     String? name,
     DateTime? date,
     String? location,
+    String? description,
+    EventCategory? category,
     int? minParticipants,
     int? maxParticipants,
     DateTime? responseCutoff,
@@ -48,6 +55,8 @@ class Event {
       name: name ?? this.name,
       date: date ?? this.date,
       location: location ?? this.location,
+      description: description ?? this.description,
+      category: category ?? this.category,
       minParticipants: minParticipants ?? this.minParticipants,
       maxParticipants: maxParticipants ?? this.maxParticipants,
       responseCutoff: responseCutoff ?? this.responseCutoff,

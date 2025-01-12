@@ -1,3 +1,4 @@
+import 'package:events_app/core/models/event_category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -47,10 +48,13 @@ class _EventListScreenState extends State<EventListScreen> {
         name: 'Summer Beach Party',
         date: DateTime.now().add(const Duration(days: 2)),
         location: 'Miami Beach',
+        category: EventCategory.food,
         minParticipants: 10,
         maxParticipants: 50,
         responseCutoff: DateTime.now().add(const Duration(days: 1)),
         participants: List.generate(30, (index) => 'user$index'),
+        hasWaitlist: true,
+        waitlist: List.generate(10, (index) => 'waitlist$index'),
       ),
     ];
 
@@ -151,7 +155,7 @@ class _EventListScreenState extends State<EventListScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      EventDetailsScreen(eventId: event.id),
+                                      EventDetailsScreen(event: event),
                                 ),
                               );
                             },
