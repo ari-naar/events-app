@@ -34,6 +34,7 @@
   - Basic event details display
 - Event Creation (Apple Design):
   - Modern iOS-style interface
+  - Clean, minimalist layout with prominent event name input
   - Smooth CupertinoDatePicker integration
   - Grouped form sections with rounded containers
   - Interactive location selection

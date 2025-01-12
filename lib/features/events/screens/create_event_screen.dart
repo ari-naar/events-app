@@ -72,7 +72,27 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
       ),
       child: Column(
         children: [
-          _buildHeader(),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            child: TextFormField(
+              controller: _nameController,
+              style: AppTypography.titleMedium,
+              decoration: InputDecoration(
+                hintText: 'Event Name',
+                hintStyle: AppTypography.titleMedium.copyWith(
+                  color: AppColors.textLight,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter an event name';
+                }
+                return null;
+              },
+            ),
+          ),
           Expanded(
             child: Form(
               key: _formKey,
@@ -101,53 +121,6 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                     ],
                   ),
                 ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textLight,
-              ),
-            ),
-          ),
-          Text(
-            'Create Event',
-            style: AppTypography.titleMedium,
-          ),
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            onPressed: _submitForm,
-            child: Text(
-              'Create',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.accent,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -239,23 +212,6 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
           ),
           child: Column(
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Event Name',
-                    border: InputBorder.none,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an event name';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
               CupertinoButton(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 onPressed: _showDatePicker,
