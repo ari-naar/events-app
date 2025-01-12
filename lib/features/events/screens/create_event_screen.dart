@@ -11,7 +11,6 @@ import '../../../core/models/event.dart';
 import 'age_range_sheet.dart';
 import 'notification_settings_sheet.dart';
 import 'recurring_options_sheet.dart';
-import 'package:flutter/services.dart';
 
 class CreateEventBottomSheet extends StatefulWidget {
   const CreateEventBottomSheet({super.key});
@@ -39,22 +38,13 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   final _maxParticipantsController = TextEditingController(text: '10');
   final _minAgeController = TextEditingController(text: '0');
   final _maxAgeController = TextEditingController(text: '100');
-  final List<String> _recentLocations = [
-    'Central Park',
-    'Brooklyn Bridge',
-    'Times Square',
-    'Battery Park',
-  ];
 
   DateTime _date = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _time = const TimeOfDay(hour: 18, minute: 0);
-  int _minParticipants = 2;
-  int _maxParticipants = 10;
   DateTime _responseCutoff = DateTime.now();
   bool _hasWaitlist = false;
   RecurringType? _recurringType;
   NotificationSettings _notificationSettings = const NotificationSettings();
-  AgeRange _ageRange = const AgeRange();
   bool _hasMinParticipants = false;
   bool _hasMaxParticipants = false;
   bool _hasMinAge = false;
@@ -158,8 +148,8 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.primary.withOpacity(0.1),
-                AppColors.accent.withOpacity(0.1),
+                AppColors.primary.withValues(alpha: 0.1),
+                AppColors.accent.withValues(alpha: 0.1),
               ],
             ),
           ),
@@ -242,7 +232,9 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                   ],
                 ),
               ),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Divider(
+                  height: 1.h,
+                  color: AppColors.textLight.withValues(alpha: 0.1)),
               CupertinoButton(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 onPressed: _showTimePicker,
@@ -262,9 +254,13 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                   ],
                 ),
               ),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Divider(
+                  height: 1.h,
+                  color: AppColors.textLight.withValues(alpha: 0.1)),
               _buildLocationField(),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Divider(
+                  height: 1.h,
+                  color: AppColors.textLight.withValues(alpha: 0.1)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: TextFormField(
@@ -395,7 +391,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                       child: Text(
                         'Map',
                         style: AppTypography.titleLarge.copyWith(
-                          color: AppColors.textLight.withOpacity(0.2),
+                          color: AppColors.textLight.withValues(alpha: 0.2),
                         ),
                       ),
                     ),
@@ -462,14 +458,15 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                           _hasMinParticipants = value;
                         });
                       },
-                      activeColor: AppColors.accent,
+                      activeTrackColor: AppColors.accent,
                     ),
                   ],
                 ),
               ),
               if (_hasMinParticipants) ...[
                 Divider(
-                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                    height: 1.h,
+                    color: AppColors.textLight.withValues(alpha: 0.1)),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: TextFormField(
@@ -500,7 +497,9 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                   ),
                 ),
               ],
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Divider(
+                  height: 1.h,
+                  color: AppColors.textLight.withValues(alpha: 0.1)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Row(
@@ -517,14 +516,15 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                           _hasMaxParticipants = value;
                         });
                       },
-                      activeColor: AppColors.accent,
+                      activeTrackColor: AppColors.accent,
                     ),
                   ],
                 ),
               ),
               if (_hasMaxParticipants) ...[
                 Divider(
-                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                    height: 1.h,
+                    color: AppColors.textLight.withValues(alpha: 0.1)),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: TextFormField(
