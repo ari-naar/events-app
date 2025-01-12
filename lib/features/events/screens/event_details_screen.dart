@@ -29,9 +29,9 @@ class EventDetailsScreen extends StatelessWidget {
                   SizedBox(height: 24.h),
                   _buildParticipantsSection(context),
                   SizedBox(height: 24.h),
-                  _buildDetailsSection(context),
-                  SizedBox(height: 24.h),
                   _buildLocationSection(context),
+                  SizedBox(height: 24.h),
+                  _buildDetailsSection(context),
                   SizedBox(height: 32.h),
                   _buildActionButtons(context),
                   SizedBox(height: 20.h),
@@ -50,42 +50,60 @@ class EventDetailsScreen extends StatelessWidget {
       pinned: true,
       stretch: true,
       backgroundColor: AppColors.background,
-      leading: CupertinoButton(
-        padding: EdgeInsets.zero,
-        onPressed: () => Navigator.pop(context),
-        child: Container(
-          margin: EdgeInsets.only(left: 16.w),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
-            shape: BoxShape.circle,
+      leading: Material(
+        color: Colors.transparent,
+        child: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.95),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(
+              CupertinoIcons.back,
+              color: AppColors.textPrimary,
+              size: 18.sp,
+            ),
           ),
-          child: Icon(
-            CupertinoIcons.back,
-            color: AppColors.textLight,
-            size: 20.sp,
-          ),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       actions: [
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () {
-            // TODO: Implement share
-          },
-          child: Container(
-            margin: EdgeInsets.only(right: 16.w),
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
-              shape: BoxShape.circle,
+        Material(
+          color: Colors.transparent,
+          child: IconButton(
+            icon: Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.95),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                CupertinoIcons.share,
+                color: AppColors.textPrimary,
+                size: 18.sp,
+              ),
             ),
-            child: Icon(
-              CupertinoIcons.share,
-              color: AppColors.textLight,
-              size: 20.sp,
-            ),
+            onPressed: () {
+              // TODO: Implement share
+            },
           ),
         ),
+        SizedBox(width: 8.w),
       ],
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
@@ -233,11 +251,34 @@ class EventDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Participants',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Participants',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              if (event.maxParticipants != null)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    '${event.participants.length}/${event.maxParticipants}',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: AppColors.accent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
                 ),
+            ],
           ),
           SizedBox(height: 16.h),
           Row(
@@ -247,6 +288,7 @@ class EventDetailsScreen extends StatelessWidget {
                 count: event.participants.length,
                 total: event.maxParticipants,
                 label: 'Going',
+                color: AppColors.success,
               ),
               if (event.hasWaitlist) ...[
                 SizedBox(width: 24.w),
@@ -254,6 +296,7 @@ class EventDetailsScreen extends StatelessWidget {
                   context,
                   count: event.waitlist.length,
                   label: 'Waitlist',
+                  color: AppColors.warning,
                 ),
               ],
             ],
@@ -264,6 +307,12 @@ class EventDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDetailsSection(BuildContext context) {
+    if (!(event.description?.isNotEmpty ?? false) &&
+        event.minAge == null &&
+        event.maxAge == null) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -274,24 +323,47 @@ class EventDetailsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Details',
+            'About',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
           ),
-          SizedBox(height: 12.h),
-          if (event.description?.isNotEmpty ?? false)
+          if (event.description?.isNotEmpty ?? false) ...[
+            SizedBox(height: 12.h),
             Text(
               event.description!,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                    color: AppColors.textSecondary,
+                  ),
             ),
+          ],
           if (event.minAge != null || event.maxAge != null) ...[
             SizedBox(height: 16.h),
-            _buildInfoRow(
-              context,
-              icon: CupertinoIcons.person_2,
-              title: 'Age Range',
-              value: _formatAgeRange(),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.person_2,
+                    size: 16.sp,
+                    color: AppColors.accent,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    _formatAgeRange(),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.accent,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ],
+              ),
             ),
           ],
         ],
@@ -309,63 +381,108 @@ class EventDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Location',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Location',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  // TODO: Open in maps
+                },
+                child: Text(
+                  'Open in Maps',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
+              ),
+            ],
           ),
           SizedBox(height: 12.h),
           Row(
             children: [
-              Icon(
-                CupertinoIcons.location_solid,
-                size: 20.sp,
-                color: AppColors.accent,
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Icon(
+                  CupertinoIcons.location_solid,
+                  size: 20.sp,
+                  color: AppColors.accent,
+                ),
               ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Text(
                   event.location,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                 ),
               ),
             ],
           ),
           SizedBox(height: 16.h),
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Text(
-                      'Map',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: AppColors.textLight.withOpacity(0.2),
-                          ),
-                    ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  border: Border.all(
+                    color: AppColors.divider,
+                    width: 1,
                   ),
-                  Positioned(
-                    right: 12.w,
-                    bottom: 12.h,
-                    child: FloatingActionButton.small(
-                      onPressed: () {
-                        // TODO: Implement directions
-                      },
-                      backgroundColor: AppColors.accent,
-                      child: Icon(
-                        CupertinoIcons.location_fill,
-                        color: Colors.white,
-                        size: 16.sp,
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        'Map',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: AppColors.textLight.withOpacity(0.2),
+                            ),
                       ),
                     ),
-                  ),
-                ],
+                    Positioned(
+                      right: 12.w,
+                      bottom: 12.h,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.accent,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.accent.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            CupertinoIcons.location_fill,
+                            color: Colors.white,
+                            size: 18.sp,
+                          ),
+                          onPressed: () {
+                            // TODO: Implement directions
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -468,6 +585,7 @@ class EventDetailsScreen extends StatelessWidget {
     required int count,
     int? total,
     required String label,
+    required Color color,
   }) {
     return Column(
       children: [
@@ -475,14 +593,14 @@ class EventDetailsScreen extends StatelessWidget {
           width: 48.w,
           height: 48.w,
           decoration: BoxDecoration(
-            color: AppColors.accent.withOpacity(0.1),
+            color: color.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
-              total != null ? '$count/$total' : count.toString(),
+              count.toString(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.accent,
+                    color: color,
                     fontWeight: FontWeight.w600,
                   ),
             ),
