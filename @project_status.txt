@@ -13,13 +13,15 @@
 - Recurring event options
 - Notification settings with customizable reminders
 - Share functionality with platform-specific handling
+- Image upload with preview and removal
+- Location integration with maps app
 
 ### Event Details Screen
 - Dynamic header with collapsing title
 - Category-based image display with loading states
 - Organized sections for event information
 - Interactive participant display
-- Location section with map integration
+- Location section with map integration and direct opening in maps
 - Join/Waitlist functionality
 - Share options with error handling
 - Analytics button with smooth navigation
@@ -39,24 +41,27 @@
 - Error handling and feedback
 - Loading states and placeholders
 - Responsive layout design
+- Platform-specific integrations (maps, sharing)
 
 ## In Progress
 
 ### Event Creation Flow
-- [ ] Image upload functionality
-- [ ] Location autocomplete
 - [ ] Advanced recurring options
 - [ ] Custom notification settings
+- [ ] Image optimization and compression
+- [ ] Location autocomplete and suggestions
 
 ### Asset Integration
 - [ ] Category image optimization
 - [ ] Placeholder image system
 - [ ] Asset preloading
+- [ ] Image caching strategy
 
 ### Map Integration
 - [ ] Interactive map view
 - [ ] Location search
 - [ ] Distance calculation
+- [ ] Venue suggestions
 
 ### Event List Features
 - [ ] Filter by category
@@ -74,11 +79,13 @@
    - Category filtering
    - Location-based search
    - Tag system
+   - Advanced filters
 
 2. Create home feed
    - Personalized recommendations
    - Trending events
    - Nearby events
+   - Featured categories
 
 ## Backlog
 - User profile management
@@ -89,3 +96,5 @@
 - Event chat/discussion
 - Calendar integration
 - Export functionality
+- Image editing tools
+- Advanced location features

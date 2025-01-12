@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,6 +7,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../core/models/event.dart';
 import '../../../core/models/event_category.dart';
 import 'event_analytics_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -508,35 +510,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Location',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      height: 1.3,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  // TODO: Open in maps
-                },
-                child: Text(
-                  'Open in Maps',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: AppColors.accent,
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                      ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          Text(
+            'Location',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
                 ),
-              ),
-            ],
           ),
           SizedBox(height: 12.h),
           Row(
@@ -558,49 +537,93 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
                 child: Text(
                   widget.event.location,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                        height: 1.4,
+                        height: 1.3,
                       ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
                 ),
               ),
             ],
           ),
           SizedBox(height: 16.h),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  border: Border.all(
-                    color: AppColors.divider,
-                    width: 1,
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () => _openInMaps(widget.event.location),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 12.h),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.map_fill,
+                    size: 20.sp,
+                    color: AppColors.accent,
                   ),
-                ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Text(
-                        'Map',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.textLight.withOpacity(0.2),
-                              height: 1.3,
-                            ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Open in Maps',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppColors.accent,
+                          fontWeight: FontWeight.w600,
+                          height: 1.3,
+                        ),
+                  ),
+                ],
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _openInMaps(String location) async {
+    try {
+      final encodedLocation = Uri.encodeComponent(location);
+      final url = Platform.isIOS
+          ? 'maps://?q=$encodedLocation'
+          : 'https://www.google.com/maps/search/?api=1&query=$encodedLocation';
+
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
+      } else {
+        if (mounted) {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) => CupertinoAlertDialog(
+              title: const Text('Could not open maps'),
+              content:
+                  const Text('Please make sure you have a maps app installed.'),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Error'),
+            content: const Text('Could not open the location in maps.'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildActionButtons(BuildContext context) {

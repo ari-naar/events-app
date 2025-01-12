@@ -1,12 +1,11 @@
+import 'dart:io';
+import 'package:events_app/config/theme/app_typography.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hugeicons/hugeicons.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../config/theme/app_colors.dart';
-import '../../../config/theme/app_typography.dart';
 import '../../../core/models/event.dart';
 import 'age_range_sheet.dart';
 import 'notification_settings_sheet.dart';
@@ -49,6 +48,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   bool _hasMaxParticipants = false;
   bool _hasMinAge = false;
   bool _hasMaxAge = false;
+  File? _selectedImage;
 
   @override
   void dispose() {
@@ -103,7 +103,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildImageSection(),
+                      _buildImageSection(context),
                       SizedBox(height: 24.h),
                       _buildBasicInfoSection(),
                       SizedBox(height: 24.h),
@@ -130,71 +130,133 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
     );
   }
 
-  Widget _buildImageSection() {
+  Widget _buildImageSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Event Image',
-          style: AppTypography.titleSmall,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+              ),
         ),
-        SizedBox(height: 8.h),
-        Container(
-          height: 200.h,
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12.r),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.primary.withValues(alpha: 0.1),
-                AppColors.accent.withValues(alpha: 0.1),
-              ],
-            ),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                // TODO: Implement image picker
-              },
+        SizedBox(height: 12.h),
+        GestureDetector(
+          onTap: _pickImage,
+          child: Container(
+            height: 200.h,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(12.r),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      CupertinoIcons.camera,
-                      size: 48.sp,
-                      color: AppColors.textLight,
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      'Add Event Image',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textLight,
-                      ),
-                    ),
-                  ],
-                ),
+              border: Border.all(
+                color: AppColors.divider,
+                width: 1,
               ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: _selectedImage != null
+                  ? Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.file(
+                          _selectedImage!,
+                          fit: BoxFit.cover,
+                        ),
+                        Positioned(
+                          top: 8.h,
+                          right: 8.w,
+                          child: GestureDetector(
+                            onTap: () => setState(() => _selectedImage = null),
+                            child: Container(
+                              padding: EdgeInsets.all(8.w),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                CupertinoIcons.xmark,
+                                size: 16.sp,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(16.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            CupertinoIcons.camera_fill,
+                            size: 32.sp,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          'Add Event Image',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.textLight,
+                                    height: 1.3,
+                                  ),
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          'Tap to upload',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppColors.textLight.withOpacity(0.7),
+                                    height: 1.3,
+                                  ),
+                        ),
+                      ],
+                    ),
             ),
           ),
         ),
-        if (_imageController.text.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.only(top: 8.h),
-            child: TextFormField(
-              controller: _imageController,
-              decoration: const InputDecoration(
-                labelText: 'Image URL',
-                border: InputBorder.none,
-              ),
-            ),
-          ),
       ],
     );
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() => _selectedImage = File(image.path));
+      }
+    } catch (e) {
+      if (mounted) {
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Error'),
+            content: const Text('Could not pick image. Please try again.'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildBasicInfoSection() {
