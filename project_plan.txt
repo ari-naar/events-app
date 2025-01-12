@@ -61,9 +61,23 @@ lib/
 │   └── services/          # Service interfaces
 ├── features/              # Feature modules
 │   ├── auth/             # Authentication
+    │   └── screens/
+    │       ├── login_screen.dart
+    │       └── signup_screen.dart
 │   ├── events/           # Event management
-│   ├── notifications/    # Notifications
-│   └── user/             # User management
+    │   └── screens/
+    │       ├── event_list_screen.dart
+    │       ├── event_details_screen.dart
+    │       └── create_event_screen.dart
+    ├── home/
+    │   └── screens/
+    │       └── home_screen.dart
+    ├── notifications/    # Notifications
+    │   └── screens/
+    │       └── notifications_screen.dart
+    └── user/             # User management
+        └── screens/
+            └── profile_screen.dart
 ├── utils/                 # Utility functions
 └── widgets/              # Reusable widgets
     ├── common/           # Shared widgets
