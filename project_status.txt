@@ -23,23 +23,35 @@
   - Event card with dynamic attendance display:
     - Admin view: participant count
     - User view: attendance status with color coding
-    - Status indicators (attending, not attending, waitlist, pending)
-- Event Creation:
-  - Modal bottom sheet implementation
-  - Basic event details form
-  - Date and time pickers
-  - Participant limits
-  - Response cutoff settings
-  - Age range selector
-  - Recurring event toggle
+    - Status indicators (attending, not attending, maybe, waitlist, pending)
 - Event List:
-  - Grid view layout
-  - Custom event cards
+  - Interactive map and list view integration
+  - Draggable modal sheet with smooth animations
+  - Smart drag behavior with tap-to-expand
+  - Grid view layout with custom cards
   - Event preview with image
   - Role-based attendance display
   - Basic event details display
+- Event Creation (Apple Design):
+  - Modern iOS-style interface
+  - Smooth CupertinoDatePicker integration
+  - Grouped form sections with rounded containers
+  - Interactive location selection
+  - Smart participant limits input
+  - Intuitive date/time selection
+  - Clean recurring event toggle
+  - Response cutoff settings
+  - Consistent visual hierarchy
+  - Gesture-friendly interactions
 
 ## In Progress
+- [ ] Event Creation Flow
+  - Form validation
+  - Event creation service integration
+  - Location picker implementation
+  - Recurring event options
+  - Preview functionality
+
 - [ ] Asset Integration
   - Custom icons for navigation
   - App icons and splash screen
@@ -47,12 +59,12 @@
   - Event placeholder images
   - HugeIcons integration
 
-- [ ] Event Creation Flow
-  - Form validation
-  - Event creation service integration
-  - Location selection
-  - Notification settings
-  - Admin management
+- [ ] Map Integration
+  - Event location markers
+  - Interactive map view
+  - Location clustering
+  - Location search
+  - Current location
 
 - [ ] Event List Features
   - Event filtering
