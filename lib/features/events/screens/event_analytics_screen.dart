@@ -1,3 +1,4 @@
+import 'dart:math' show cos, sin, pi;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -97,14 +98,33 @@ class _EventAnalyticsScreenState extends State<EventAnalyticsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Overview',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  height: 1.3,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Overview',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => _showParticipantDetails(context),
+                child: Text(
+                  'View Details',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: AppColors.accent,
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
           SizedBox(height: 16.h),
           _buildOverviewItem(
@@ -147,33 +167,14 @@ class _EventAnalyticsScreenState extends State<EventAnalyticsScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Gender Distribution',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      height: 1.3,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: () => _showParticipantDetails(context),
-                child: Text(
-                  'View Details',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: AppColors.accent,
-                        fontWeight: FontWeight.w600,
-                        height: 1.3,
-                      ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+          Text(
+            'Gender Distribution',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
                 ),
-              ),
-            ],
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: 16.h),
           AspectRatio(
@@ -195,10 +196,17 @@ class _EventAnalyticsScreenState extends State<EventAnalyticsScreen>
                         return CustomPaint(
                           size: Size.square(200.w),
                           painter: GenderDistributionPainter(
-                            male: 10, // TODO: Replace with actual gender counts
+                            male: 10,
                             female: 15,
                             other: 5,
                             animationValue: value,
+                            textStyle: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         );
                       },
@@ -211,9 +219,12 @@ class _EventAnalyticsScreenState extends State<EventAnalyticsScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildLegendItem(context, 'Male', AppColors.primary),
-                        _buildLegendItem(context, 'Female', AppColors.accent),
-                        _buildLegendItem(context, 'Other', AppColors.success),
+                        _buildLegendItem(
+                            context, 'Male (10)', AppColors.primary),
+                        _buildLegendItem(
+                            context, 'Female (15)', AppColors.accent),
+                        _buildLegendItem(
+                            context, 'Other (5)', AppColors.success),
                       ],
                     ),
                   ),
@@ -462,12 +473,14 @@ class GenderDistributionPainter extends CustomPainter {
   final int female;
   final int other;
   final double animationValue;
+  final TextStyle textStyle;
 
   GenderDistributionPainter({
     required this.male,
     required this.female,
     required this.other,
     required this.animationValue,
+    required this.textStyle,
   });
 
   @override
@@ -491,19 +504,42 @@ class GenderDistributionPainter extends CustomPainter {
       ..color = AppColors.success
       ..style = PaintingStyle.fill;
 
-    final maleAngle = (male / total) * 2 * 3.14159 * animationValue;
-    final femaleAngle = (female / total) * 2 * 3.14159 * animationValue;
-    final otherAngle = (other / total) * 2 * 3.14159 * animationValue;
+    final maleAngle = (male / total) * 2 * pi * animationValue;
+    final femaleAngle = (female / total) * 2 * pi * animationValue;
+    final otherAngle = (other / total) * 2 * pi * animationValue;
 
-    var startAngle = -1.5708; // Start from top (-90 degrees)
+    var startAngle = -pi / 2; // Start from top (-90 degrees)
 
+    // Draw arcs
     canvas.drawArc(rect, startAngle, maleAngle, true, malePaint);
+    _drawText(canvas, center, startAngle + maleAngle / 2, radius * 0.7,
+        male.toString(), textStyle);
     startAngle += maleAngle;
 
     canvas.drawArc(rect, startAngle, femaleAngle, true, femalePaint);
+    _drawText(canvas, center, startAngle + femaleAngle / 2, radius * 0.7,
+        female.toString(), textStyle);
     startAngle += femaleAngle;
 
     canvas.drawArc(rect, startAngle, otherAngle, true, otherPaint);
+    _drawText(canvas, center, startAngle + otherAngle / 2, radius * 0.7,
+        other.toString(), textStyle);
+  }
+
+  void _drawText(Canvas canvas, Offset center, double angle, double radius,
+      String text, TextStyle style) {
+    final textSpan = TextSpan(text: text, style: style);
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
+    textPainter.layout();
+
+    final x = center.dx + radius * cos(angle) - textPainter.width / 2;
+    final y = center.dy + radius * sin(angle) - textPainter.height / 2;
+
+    textPainter.paint(canvas, Offset(x, y));
   }
 
   @override
