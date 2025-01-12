@@ -24,6 +24,10 @@
     - Admin view: participant count
     - User view: attendance status with color coding
     - Status indicators (attending, not attending, maybe, waitlist, pending)
+  - Location selector with:
+    - Direct location input
+    - Map view placeholder
+    - Current location button
 - Event List:
   - Interactive map and list view integration
   - Draggable modal sheet with smooth animations
@@ -37,7 +41,7 @@
   - Clean, minimalist layout with prominent event name input
   - Smooth CupertinoDatePicker integration
   - Grouped form sections with rounded containers
-  - Interactive location selection
+  - Simple location input with map preview
   - Optional participant limits with text input
   - Optional age range with text input
   - Intuitive date/time selection
@@ -50,7 +54,7 @@
 - [ ] Event Creation Flow
   - Form validation
   - Event creation service integration
-  - Location picker implementation
+  - Location picker map integration
   - Recurring event options
   - Preview functionality
 

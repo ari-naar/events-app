@@ -34,6 +34,12 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   final _maxParticipantsController = TextEditingController(text: '10');
   final _minAgeController = TextEditingController(text: '0');
   final _maxAgeController = TextEditingController(text: '100');
+  final List<String> _recentLocations = [
+    'Central Park',
+    'Brooklyn Bridge',
+    'Times Square',
+    'Battery Park',
+  ];
 
   DateTime _date = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _time = const TimeOfDay(hour: 18, minute: 0);
@@ -252,22 +258,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                 ),
               ),
               Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: TextFormField(
-                  controller: _locationController,
-                  decoration: const InputDecoration(
-                    labelText: 'Location',
-                    border: InputBorder.none,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a location';
-                    }
-                    return null;
-                  },
-                ),
-              ),
+              _buildLocationField(),
               Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -285,6 +276,149 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
         ),
       ],
     );
+  }
+
+  Widget _buildLocationField() {
+    return TextFormField(
+      controller: _locationController,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: 'Location',
+        border: InputBorder.none,
+        prefixIcon: Icon(
+          CupertinoIcons.map_pin,
+          size: 20.sp,
+          color: AppColors.textLight,
+        ),
+      ),
+      onTap: _showLocationPicker,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please select a location';
+        }
+        return null;
+      },
+    );
+  }
+
+  void _showLocationPicker() async {
+    final location = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.9,
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(16.w),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Select Location',
+                    style: AppTypography.titleMedium,
+                  ),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () =>
+                        Navigator.pop(context, _locationController.text),
+                    child: Text(
+                      'Done',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.accent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: TextFormField(
+                autofocus: true,
+                onChanged: (value) {
+                  setState(() {
+                    _locationController.text = value;
+                  });
+                },
+                initialValue: _locationController.text,
+                decoration: InputDecoration(
+                  hintText: 'Enter location',
+                  prefixIcon: Icon(
+                    CupertinoIcons.map_pin,
+                    size: 20.sp,
+                    color: AppColors.textLight,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: AppColors.surface,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        'Map',
+                        style: AppTypography.titleLarge.copyWith(
+                          color: AppColors.textLight.withOpacity(0.2),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 16.w,
+                      bottom: 16.h,
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          // TODO: Implement current location
+                        },
+                        backgroundColor: AppColors.accent,
+                        child: Icon(
+                          CupertinoIcons.location_fill,
+                          color: Colors.white,
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (location != null) {
+      setState(() {
+        _locationController.text = location;
+      });
+    }
   }
 
   Widget _buildParticipantsSection() {
