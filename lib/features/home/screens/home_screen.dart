@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../widgets/common/custom_bottom_nav_bar.dart';
+import '../../events/screens/event_list_screen.dart';
+import '../../events/screens/create_event_screen.dart';
+import '../../user/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,6 +14,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
+  final List<Widget> _screens = [
+    const Center(child: Text('Home Feed')), // Home screen
+    const Center(child: Text('Search')), // Search screen
+    const CreateEventScreen(), // Create Event screen
+    const EventListScreen(), // Events screen
+    const ProfileScreen(), // Profile screen
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -19,26 +31,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text('Selected Index: $_selectedIndex'),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: 'Events',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+      bottomNavigationBar: CustomBottomNavBar(
+        selectedIndex: _selectedIndex,
+        onItemSelected: _onItemTapped,
       ),
     );
   }
