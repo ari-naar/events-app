@@ -29,6 +29,11 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   final _nameController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _imageController = TextEditingController();
+  final _minParticipantsController = TextEditingController(text: '2');
+  final _maxParticipantsController = TextEditingController(text: '10');
+  final _minAgeController = TextEditingController(text: '0');
+  final _maxAgeController = TextEditingController(text: '100');
 
   DateTime _date = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _time = const TimeOfDay(hour: 18, minute: 0);
@@ -39,12 +44,21 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   RecurringType? _recurringType;
   NotificationSettings _notificationSettings = const NotificationSettings();
   AgeRange _ageRange = const AgeRange();
+  bool _hasMinParticipants = false;
+  bool _hasMaxParticipants = false;
+  bool _hasMinAge = false;
+  bool _hasMaxAge = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
+    _imageController.dispose();
+    _minParticipantsController.dispose();
+    _maxParticipantsController.dispose();
+    _minAgeController.dispose();
+    _maxAgeController.dispose();
     super.dispose();
   }
 
@@ -68,6 +82,8 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      _buildImageSection(),
+                      SizedBox(height: 24.h),
                       _buildBasicInfoSection(),
                       SizedBox(height: 24.h),
                       _buildParticipantsSection(),
@@ -137,6 +153,73 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildImageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Event Image',
+          style: AppTypography.titleSmall,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          height: 200.h,
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.r),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primary.withOpacity(0.1),
+                AppColors.accent.withOpacity(0.1),
+              ],
+            ),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                // TODO: Implement image picker
+              },
+              borderRadius: BorderRadius.circular(12.r),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      CupertinoIcons.camera,
+                      size: 48.sp,
+                      color: AppColors.textLight,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Add Event Image',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (_imageController.text.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(top: 8.h),
+            child: TextFormField(
+              controller: _imageController,
+              decoration: const InputDecoration(
+                labelText: 'Image URL',
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -264,60 +347,20 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
           ),
           child: Column(
             children: [
-              CupertinoButton(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                onPressed: () => _showParticipantsPicker(isMin: true),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Minimum Participants',
-                      style: AppTypography.bodyMedium,
-                    ),
-                    Text(
-                      '$_minParticipants',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textLight,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
-              CupertinoButton(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                onPressed: () => _showParticipantsPicker(isMin: false),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Maximum Participants',
-                      style: AppTypography.bodyMedium,
-                    ),
-                    Text(
-                      '$_maxParticipants',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textLight,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Enable Waitlist',
+                      'Set Minimum',
                       style: AppTypography.bodyMedium,
                     ),
                     CupertinoSwitch(
-                      value: _hasWaitlist,
+                      value: _hasMinParticipants,
                       onChanged: (value) {
                         setState(() {
-                          _hasWaitlist = value;
+                          _hasMinParticipants = value;
                         });
                       },
                       activeColor: AppColors.accent,
@@ -325,6 +368,119 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                   ],
                 ),
               ),
+              if (_hasMinParticipants) ...[
+                Divider(
+                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: TextFormField(
+                    controller: _minParticipantsController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Minimum Participants',
+                      border: InputBorder.none,
+                    ),
+                    validator: (value) {
+                      if (!_hasMinParticipants) return null;
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter minimum participants';
+                      }
+                      final number = int.tryParse(value);
+                      if (number == null || number < 1) {
+                        return 'Please enter a valid number';
+                      }
+                      if (_hasMaxParticipants) {
+                        final max =
+                            int.tryParse(_maxParticipantsController.text);
+                        if (max != null && number > max) {
+                          return 'Minimum cannot be greater than maximum';
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Set Maximum',
+                      style: AppTypography.bodyMedium,
+                    ),
+                    CupertinoSwitch(
+                      value: _hasMaxParticipants,
+                      onChanged: (value) {
+                        setState(() {
+                          _hasMaxParticipants = value;
+                        });
+                      },
+                      activeColor: AppColors.accent,
+                    ),
+                  ],
+                ),
+              ),
+              if (_hasMaxParticipants) ...[
+                Divider(
+                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: TextFormField(
+                    controller: _maxParticipantsController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Maximum Participants',
+                      border: InputBorder.none,
+                    ),
+                    validator: (value) {
+                      if (!_hasMaxParticipants) return null;
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter maximum participants';
+                      }
+                      final number = int.tryParse(value);
+                      if (number == null || number < 1) {
+                        return 'Please enter a valid number';
+                      }
+                      if (_hasMinParticipants) {
+                        final min =
+                            int.tryParse(_minParticipantsController.text);
+                        if (min != null && number < min) {
+                          return 'Maximum cannot be less than minimum';
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+              if (_hasMaxParticipants) ...[
+                Divider(
+                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Enable Waitlist',
+                        style: AppTypography.bodyMedium,
+                      ),
+                      CupertinoSwitch(
+                        value: _hasWaitlist,
+                        onChanged: (value) {
+                          setState(() {
+                            _hasWaitlist = value;
+                          });
+                        },
+                        activeColor: AppColors.accent,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -459,24 +615,116 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(12.r),
           ),
-          child: CupertinoButton(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            onPressed: _showAgeRangePicker,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Age Limits',
-                  style: AppTypography.bodyMedium,
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Set Minimum Age',
+                      style: AppTypography.bodyMedium,
+                    ),
+                    CupertinoSwitch(
+                      value: _hasMinAge,
+                      onChanged: (value) {
+                        setState(() {
+                          _hasMinAge = value;
+                        });
+                      },
+                      activeColor: AppColors.accent,
+                    ),
+                  ],
                 ),
-                Text(
-                  '${_ageRange.minAge} - ${_ageRange.maxAge} years',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textLight,
+              ),
+              if (_hasMinAge) ...[
+                Divider(
+                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: TextFormField(
+                    controller: _minAgeController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Minimum Age',
+                      border: InputBorder.none,
+                    ),
+                    validator: (value) {
+                      if (!_hasMinAge) return null;
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter minimum age';
+                      }
+                      final number = int.tryParse(value);
+                      if (number == null || number < 0) {
+                        return 'Please enter a valid age';
+                      }
+                      if (_hasMaxAge) {
+                        final max = int.tryParse(_maxAgeController.text);
+                        if (max != null && number > max) {
+                          return 'Minimum age cannot be greater than maximum';
+                        }
+                      }
+                      return null;
+                    },
                   ),
                 ),
               ],
-            ),
+              Divider(height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Set Maximum Age',
+                      style: AppTypography.bodyMedium,
+                    ),
+                    CupertinoSwitch(
+                      value: _hasMaxAge,
+                      onChanged: (value) {
+                        setState(() {
+                          _hasMaxAge = value;
+                        });
+                      },
+                      activeColor: AppColors.accent,
+                    ),
+                  ],
+                ),
+              ),
+              if (_hasMaxAge) ...[
+                Divider(
+                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: TextFormField(
+                    controller: _maxAgeController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Maximum Age',
+                      border: InputBorder.none,
+                    ),
+                    validator: (value) {
+                      if (!_hasMaxAge) return null;
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter maximum age';
+                      }
+                      final number = int.tryParse(value);
+                      if (number == null || number < 0) {
+                        return 'Please enter a valid age';
+                      }
+                      if (_hasMinAge) {
+                        final min = int.tryParse(_minAgeController.text);
+                        if (min != null && number < min) {
+                          return 'Maximum age cannot be less than minimum';
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       ],
@@ -546,41 +794,6 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
     }
   }
 
-  void _showParticipantsPicker({required bool isMin}) async {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        height: 200.h,
-        color: AppColors.background,
-        child: CupertinoPicker(
-          itemExtent: 32.h,
-          scrollController: FixedExtentScrollController(
-            initialItem: isMin ? _minParticipants - 1 : _maxParticipants - 1,
-          ),
-          onSelectedItemChanged: (index) {
-            setState(() {
-              if (isMin) {
-                _minParticipants = index + 1;
-                if (_minParticipants > _maxParticipants) {
-                  _maxParticipants = _minParticipants;
-                }
-              } else {
-                _maxParticipants = index + 1;
-                if (_maxParticipants < _minParticipants) {
-                  _minParticipants = _maxParticipants;
-                }
-              }
-            });
-          },
-          children: List.generate(
-            100,
-            (index) => Center(child: Text('${index + 1}')),
-          ),
-        ),
-      ),
-    );
-  }
-
   void _showResponseCutoffPicker() async {
     final picked = await showDatePicker(
       context: context,
@@ -616,18 +829,6 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
     }
   }
 
-  void _showAgeRangePicker() async {
-    final range = await AgeRangeSheet.show(
-      context,
-      initialRange: _ageRange,
-    );
-    if (range != null) {
-      setState(() {
-        _ageRange = range;
-      });
-    }
-  }
-
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
       final event = Event(
@@ -635,12 +836,18 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
         name: _nameController.text,
         date: _date,
         location: _locationController.text,
-        minParticipants: _minParticipants,
-        maxParticipants: _maxParticipants,
+        minParticipants: _hasMinParticipants
+            ? int.parse(_minParticipantsController.text)
+            : null,
+        maxParticipants: _hasMaxParticipants
+            ? int.parse(_maxParticipantsController.text)
+            : null,
         responseCutoff: _responseCutoff,
-        hasWaitlist: _hasWaitlist,
+        hasWaitlist: _hasWaitlist && _hasMaxParticipants,
         participants: const [],
         waitlist: const [],
+        minAge: _hasMinAge ? int.parse(_minAgeController.text) : null,
+        maxAge: _hasMaxAge ? int.parse(_maxAgeController.text) : null,
       );
       Navigator.pop(context, event);
     }

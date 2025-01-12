@@ -37,7 +37,8 @@
   - Smooth CupertinoDatePicker integration
   - Grouped form sections with rounded containers
   - Interactive location selection
-  - Smart participant limits input
+  - Optional participant limits with text input
+  - Optional age range with text input
   - Intuitive date/time selection
   - Clean recurring event toggle
   - Response cutoff settings

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -41,14 +42,27 @@ class EventCard extends StatelessWidget {
           children: [
             Stack(
               children: [
-                ClipRRect(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(16.r)),
-                  child: Image.network(
-                    'https://picsum.photos/200',
-                    height: 120.h,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+                Container(
+                  height: 120.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16.r)),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary.withOpacity(0.1),
+                        AppColors.accent.withOpacity(0.1),
+                      ],
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      CupertinoIcons.calendar,
+                      size: 32.sp,
+                      color: AppColors.textLight.withOpacity(0.5),
+                    ),
                   ),
                 ),
                 Positioned(
@@ -73,7 +87,7 @@ class EventCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        HugeIcons.strokeRoundedCalendar01,
+                        CupertinoIcons.calendar,
                         size: 16.sp,
                         color: AppColors.textLight,
                       ),
@@ -90,7 +104,7 @@ class EventCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        HugeIcons.strokeRoundedLocation05,
+                        CupertinoIcons.location,
                         size: 16.sp,
                         color: AppColors.textLight,
                       ),

@@ -5,24 +5,28 @@ class Event {
   final String name;
   final DateTime date;
   final String location;
-  final int minParticipants;
-  final int maxParticipants;
+  final int? minParticipants;
+  final int? maxParticipants;
   final DateTime responseCutoff;
   final bool hasWaitlist;
   final List<String> participants;
   final List<String> waitlist;
+  final int? minAge;
+  final int? maxAge;
 
   Event({
     required this.id,
     required this.name,
     required this.date,
     required this.location,
-    required this.minParticipants,
-    required this.maxParticipants,
+    this.minParticipants,
+    this.maxParticipants,
     required this.responseCutoff,
     this.hasWaitlist = false,
     this.participants = const [],
     this.waitlist = const [],
+    this.minAge,
+    this.maxAge,
   });
 
   Event copyWith({
@@ -36,6 +40,8 @@ class Event {
     bool? hasWaitlist,
     List<String>? participants,
     List<String>? waitlist,
+    int? minAge,
+    int? maxAge,
   }) {
     return Event(
       id: id ?? this.id,
@@ -48,6 +54,8 @@ class Event {
       hasWaitlist: hasWaitlist ?? this.hasWaitlist,
       participants: participants ?? this.participants,
       waitlist: waitlist ?? this.waitlist,
+      minAge: minAge ?? this.minAge,
+      maxAge: maxAge ?? this.maxAge,
     );
   }
 }
