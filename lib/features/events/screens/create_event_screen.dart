@@ -1,11 +1,13 @@
 import 'dart:io';
-import 'package:events_app/config/theme/app_typography.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_typography.dart';
 import '../../../core/models/event.dart';
 import 'age_range_sheet.dart';
 import 'notification_settings_sheet.dart';
@@ -1112,7 +1114,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                               // Show copy feedback
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
+                                  content: const Text(
                                     'Link copied to clipboard',
                                     style: TextStyle(color: Colors.white),
                                   ),
@@ -1153,31 +1155,31 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildShareOption(
-                          icon: HugeIcons.strokeRoundedMessage01,
+                          icon: CupertinoIcons.chat_bubble_fill,
                           label: 'Messages',
                           color: const Color(0xFF25D366),
                           onTap: () => _shareViaWhatsApp(event),
                         ),
                         _buildShareOption(
-                          icon: HugeIcons.strokeRoundedInstagram,
+                          icon: CupertinoIcons.photo_fill,
                           label: 'Instagram',
                           color: const Color(0xFFE4405F),
                           onTap: () => _shareViaInstagram(event),
                         ),
                         _buildShareOption(
-                          icon: HugeIcons.strokeRoundedNewTwitter,
+                          icon: CupertinoIcons.at,
                           label: 'X',
                           color: Colors.black,
                           onTap: () => _shareViaX(event),
                         ),
                         _buildShareOption(
-                          icon: HugeIcons.strokeRoundedFacebook02,
+                          icon: CupertinoIcons.f_cursive,
                           label: 'Facebook',
                           color: const Color(0xFF1877F2),
                           onTap: () => _shareViaFacebook(event),
                         ),
                         _buildShareOption(
-                          icon: HugeIcons.strokeRoundedMail01,
+                          icon: CupertinoIcons.mail_solid,
                           label: 'Email',
                           color: AppColors.textLight,
                           onTap: () => _shareViaEmail(event),

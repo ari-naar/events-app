@@ -53,6 +53,10 @@
 		<string>twitter</string>
 		<string>facebook</string>
 		<string>mailto</string>
+		<string>comgooglemaps</string>
+		<string>waze</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location to show event locations on the map.</string>
 </dict>
 </plist>

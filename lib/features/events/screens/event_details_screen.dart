@@ -2,12 +2,13 @@ import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../core/models/event.dart';
 import '../../../core/models/event_category.dart';
 import 'event_analytics_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Event event;
@@ -544,9 +545,74 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
             ],
           ),
           SizedBox(height: 16.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: SizedBox(
+              height: 200.h,
+              width: double.infinity,
+              child: FutureBuilder<List<Location>>(
+                future: locationFromAddress(widget.event.location),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final location = snapshot.data!.first;
+                    return GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(location.latitude, location.longitude),
+                        zoom: 15,
+                      ),
+                      markers: {
+                        Marker(
+                          markerId: MarkerId(widget.event.id),
+                          position:
+                              LatLng(location.latitude, location.longitude),
+                        ),
+                      },
+                      zoomControlsEnabled: false,
+                      mapToolbarEnabled: false,
+                      myLocationButtonEnabled: false,
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Container(
+                      color: AppColors.surface,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              CupertinoIcons.map_fill,
+                              size: 48.sp,
+                              color: AppColors.textLight,
+                            ),
+                            SizedBox(height: 16.h),
+                            Text(
+                              'Could not load map',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    color: AppColors.textLight,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  return Container(
+                    color: AppColors.surface,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          SizedBox(height: 16.h),
           CupertinoButton(
             padding: EdgeInsets.zero,
-            onPressed: () => _openInMaps(widget.event.location),
+            onPressed: () => _showMapOptions(context),
             child: Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -580,40 +646,78 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
     );
   }
 
-  Future<void> _openInMaps(String location) async {
+  void _showMapOptions(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        title: const Text('Open Location In'),
+        actions: [
+          if (Platform.isIOS)
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+                _openInMaps(widget.event.location, mapType: 'apple');
+              },
+              child: const Text('Apple Maps'),
+            ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              _openInMaps(widget.event.location, mapType: 'google');
+            },
+            child: const Text('Google Maps'),
+          ),
+          if (Platform.isIOS)
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+                _openInMaps(widget.event.location, mapType: 'waze');
+              },
+              child: const Text('Waze'),
+            ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(context),
+          isDestructiveAction: true,
+          child: const Text('Cancel'),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openInMaps(String location, {required String mapType}) async {
     try {
       final encodedLocation = Uri.encodeComponent(location);
-      final url = Platform.isIOS
-          ? 'maps://?q=$encodedLocation'
-          : 'https://www.google.com/maps/search/?api=1&query=$encodedLocation';
+      String url;
 
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url));
-      } else {
-        if (mounted) {
-          showCupertinoDialog(
-            context: context,
-            builder: (context) => CupertinoAlertDialog(
-              title: const Text('Could not open maps'),
-              content:
-                  const Text('Please make sure you have a maps app installed.'),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('OK'),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          );
-        }
+      switch (mapType) {
+        case 'apple':
+          url = 'maps://?q=$encodedLocation';
+          break;
+        case 'google':
+          url =
+              'https://www.google.com/maps/search/?api=1&query=$encodedLocation';
+          break;
+        case 'waze':
+          url = 'waze://?q=$encodedLocation';
+          break;
+        default:
+          url = Platform.isIOS
+              ? 'maps://?q=$encodedLocation'
+              : 'https://www.google.com/maps/search/?api=1&query=$encodedLocation';
       }
-    } catch (e) {
-      if (mounted) {
+
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (!mounted) return;
         showCupertinoDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
-            title: const Text('Error'),
-            content: const Text('Could not open the location in maps.'),
+            title: Text('Could not open ${mapType.toUpperCase()} Maps'),
+            content: Text(
+                'Please make sure you have ${mapType.toUpperCase()} Maps installed.'),
             actions: [
               CupertinoDialogAction(
                 child: const Text('OK'),
@@ -623,6 +727,21 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
           ),
         );
       }
+    } catch (e) {
+      if (!mounted) return;
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('Error'),
+          content: const Text('Could not open the location in maps.'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
     }
   }
 
