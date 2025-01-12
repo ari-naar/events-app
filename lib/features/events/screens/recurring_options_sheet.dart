@@ -5,6 +5,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 
 enum RecurringType {
+  never('Never'),
   daily('Daily'),
   weekly('Weekly'),
   monthly('Monthly'),
@@ -31,7 +32,7 @@ class RecurringOptionsSheet extends StatefulWidget {
 }
 
 class _RecurringOptionsSheetState extends State<RecurringOptionsSheet> {
-  RecurringType _selectedType = RecurringType.weekly;
+  RecurringType _selectedType = RecurringType.never;
 
   @override
   Widget build(BuildContext context) {
