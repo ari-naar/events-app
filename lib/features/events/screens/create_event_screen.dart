@@ -51,6 +51,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
   bool _hasMinAge = false;
   bool _hasMaxAge = false;
   File? _selectedImage;
+  EventType _eventType = EventType.public;
 
   @override
   void dispose() {
@@ -106,6 +107,8 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildImageSection(),
+                      SizedBox(height: 24.h),
+                      _buildEventTypeSection(),
                       SizedBox(height: 24.h),
                       _buildBasicInfoSection(),
                       SizedBox(height: 24.h),
@@ -307,6 +310,114 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
           ],
         ),
       );
+    }
+  }
+
+  Widget _buildEventTypeSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Event Type',
+          style: AppTypography.titleSmall,
+        ),
+        SizedBox(height: 8.h),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.w),
+            child: Row(
+              children: EventType.values.map((type) {
+                final isSelected = type == _eventType;
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _eventType = type;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected ? AppColors.accent : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _getEventTypeIcon(type),
+                            size: 16.sp,
+                            color:
+                                isSelected ? Colors.white : AppColors.textLight,
+                          ),
+                          SizedBox(width: 6.w),
+                          Text(
+                            type.label,
+                            style: AppTypography.labelSmall.copyWith(
+                              color: isSelected
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        SizedBox(height: 12.h),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16.w),
+          decoration: BoxDecoration(
+            color: AppColors.accent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: AppColors.accent.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                _getEventTypeIcon(_eventType),
+                size: 20.sp,
+                color: AppColors.accent,
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  _eventType.description,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textPrimary,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  IconData _getEventTypeIcon(EventType type) {
+    switch (type) {
+      case EventType.inviteOnly:
+        return CupertinoIcons.envelope_fill;
+      case EventType.private:
+        return CupertinoIcons.lock_fill;
+      case EventType.public:
+        return CupertinoIcons.globe;
     }
   }
 
@@ -1060,6 +1171,7 @@ class _CreateEventBottomSheetState extends State<CreateEventBottomSheet> {
         waitlist: const [],
         minAge: _hasMinAge ? int.parse(_minAgeController.text) : null,
         maxAge: _hasMaxAge ? int.parse(_maxAgeController.text) : null,
+        type: _eventType,
       );
 
       // Show completion screen

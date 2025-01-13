@@ -601,7 +601,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
               height: 200.h,
               width: double.infinity,
               child: FutureBuilder<List<Location>>(
-                future: locationFromAddress(widget.event.location),
+                future: null,
+                // future: locationFromAddress(widget.event.location),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final location = snapshot.data!.first;

@@ -5,6 +5,7 @@
 ### Event Creation
 - Modern form with intuitive sections for event details
 - Category selection with predefined options and images
+- Event privacy settings (Public/Private/Invite Only)
 - Location input with validation
 - Date and time selection with CupertinoDatePicker
 - Participant limits and waitlist options
@@ -21,10 +22,11 @@
 ### Event Details Screen
 - Dynamic header with collapsing title
 - Category-based image display with loading states
+- Privacy status indicator and access controls
 - Organized sections for event information
 - Interactive participant display
 - Location section with map integration and direct opening in maps
-- Join/Waitlist functionality
+- Join/Waitlist functionality with privacy rules
 - Share options with error handling
 - Analytics button with smooth navigation
 
@@ -55,6 +57,8 @@
   - [ ] Format optimization
   - [ ] Metadata handling
 - [ ] Location autocomplete and suggestions
+- [ ] Invite system for private/invite-only events
+- [ ] Request handling for private events
 
 ### Asset Integration
 - [ ] Category image optimization
@@ -69,6 +73,7 @@
 - [ ] Venue suggestions
 
 ### Event List Features
+- [ ] Filter by event type
 - [ ] Filter by category
 - [ ] Search functionality
 - [ ] Sort options
@@ -78,28 +83,36 @@
 - [ ] User registration
 - [ ] Profile management
 - [ ] Social login options
+- [ ] Role-based access control
 
 ## Next Steps
-1. Complete Image Optimization System
+1. Complete Privacy & Access Control
+   - Implement invite system
+   - Add request handling
+   - Setup notifications for requests/invites
+   - Add user roles and permissions
+
+2. Complete Image Optimization System
    - Implement advanced compression
    - Add format conversion
    - Setup caching system
    - Handle metadata
    - Add image editing capabilities
 
-2. Enhance Location Features
+3. Enhance Location Features
    - Add location autocomplete
    - Implement venue suggestions
    - Add distance-based search
    - Integrate interactive maps
 
-3. Implement Search & Discovery
+4. Implement Search & Discovery
+   - Privacy-aware filtering
    - Category filtering
    - Location-based search
    - Tag system
    - Advanced filters
 
-4. Create Home Feed
+5. Create Home Feed
    - Personalized recommendations
    - Trending events
    - Nearby events
