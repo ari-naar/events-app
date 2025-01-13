@@ -327,7 +327,7 @@ class _EventAnalyticsScreenState extends State<EventAnalyticsScreen>
         Container(
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8.r),
           ),
           child: Icon(
@@ -426,7 +426,7 @@ class _EventAnalyticsScreenState extends State<EventAnalyticsScreen>
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: AppColors.accent.withOpacity(0.1),
+              color: AppColors.accent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
@@ -635,7 +635,8 @@ class _ParticipantDetailsSheetState extends State<ParticipantDetailsSheet> {
                                   ?.copyWith(
                                     color: _selectedSegment == i
                                         ? AppColors.accent
-                                        : AppColors.textLight.withOpacity(0.7),
+                                        : AppColors.textLight
+                                            .withValues(alpha: 0.7),
                                     fontWeight: FontWeight.w600,
                                     height: 1.3,
                                   ),
@@ -663,7 +664,7 @@ class _ParticipantDetailsSheetState extends State<ParticipantDetailsSheet> {
             Container(
               height: 1,
               margin: EdgeInsets.only(top: 8.h),
-              color: AppColors.textLight.withOpacity(0.1),
+              color: AppColors.textLight.withValues(alpha: 0.1),
             ),
             Expanded(
               child: AnimatedSwitcher(
@@ -705,7 +706,7 @@ class _ParticipantDetailsSheetState extends State<ParticipantDetailsSheet> {
             Icon(
               CupertinoIcons.person_2_fill,
               size: 48.sp,
-              color: AppColors.textLight.withOpacity(0.2),
+              color: AppColors.textLight.withValues(alpha: 0.2),
             ),
             SizedBox(height: 16.h),
             Text(
@@ -719,7 +720,7 @@ class _ParticipantDetailsSheetState extends State<ParticipantDetailsSheet> {
             Text(
               'Share the event to get people involved',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textLight.withOpacity(0.7),
+                    color: AppColors.textLight.withValues(alpha: 0.7),
                     height: 1.3,
                   ),
             ),
@@ -746,7 +747,7 @@ class _ParticipantDetailsSheetState extends State<ParticipantDetailsSheet> {
                     width: 48.w,
                     height: 48.w,
                     decoration: BoxDecoration(
-                      color: AppColors.accent.withOpacity(0.1),
+                      color: AppColors.accent.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -796,7 +797,7 @@ class _ParticipantDetailsSheetState extends State<ParticipantDetailsSheet> {
                 padding: EdgeInsets.only(left: 64.w),
                 child: Divider(
                   height: 1.h,
-                  color: AppColors.textLight.withOpacity(0.1),
+                  color: AppColors.textLight.withValues(alpha: 0.1),
                 ),
               ),
           ],

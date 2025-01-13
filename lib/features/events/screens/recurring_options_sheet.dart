@@ -87,7 +87,7 @@ class _RecurringOptionsSheetState extends State<RecurringOptionsSheet> {
                             Divider(
                               height: 1.h,
                               indent: 16.w,
-                              color: AppColors.textLight.withOpacity(0.1),
+                              color: AppColors.textLight.withValues(alpha: 0.1),
                             ),
                         ],
                       );
@@ -110,7 +110,7 @@ class _RecurringOptionsSheetState extends State<RecurringOptionsSheet> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

@@ -111,7 +111,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -183,14 +183,15 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                               _settings.copyWith(reminderEnabled: value);
                         });
                       },
-                      activeColor: AppColors.accent,
+                      activeTrackColor: AppColors.accent,
                     ),
                   ],
                 ),
               ),
               if (_settings.reminderEnabled) ...[
                 Divider(
-                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                    height: 1.h,
+                    color: AppColors.textLight.withValues(alpha: 0.1)),
                 CupertinoButton(
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -260,14 +261,15 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
                               responseReminderEnabled: value);
                         });
                       },
-                      activeColor: AppColors.accent,
+                      activeTrackColor: AppColors.accent,
                     ),
                   ],
                 ),
               ),
               if (_settings.responseReminderEnabled) ...[
                 Divider(
-                    height: 1.h, color: AppColors.textLight.withOpacity(0.1)),
+                    height: 1.h,
+                    color: AppColors.textLight.withValues(alpha: 0.1)),
                 CupertinoButton(
                   padding:
                       EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),

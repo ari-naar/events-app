@@ -27,7 +27,7 @@ class EventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
@@ -52,7 +52,8 @@ class EventCard extends StatelessWidget {
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return Container(
-                              color: event.category?.color.withOpacity(0.1) ??
+                              color: event.category?.color
+                                      .withValues(alpha: 0.1) ??
                                   AppColors.surface,
                               child: Center(
                                 child: CircularProgressIndicator(
@@ -70,7 +71,8 @@ class EventCard extends StatelessWidget {
                           },
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              color: event.category?.color.withOpacity(0.1) ??
+                              color: event.category?.color
+                                      .withValues(alpha: 0.1) ??
                                   AppColors.surface,
                               child: Center(
                                 child: Column(
@@ -107,7 +109,7 @@ class EventCard extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.7),
+                              Colors.black.withValues(alpha: 0.7),
                             ],
                           ),
                         ),
@@ -121,8 +123,10 @@ class EventCard extends StatelessWidget {
                             vertical: 4.h,
                           ),
                           decoration: BoxDecoration(
-                            color: event.category?.color.withOpacity(0.9) ??
-                                EventCategory.other.color.withOpacity(0.9),
+                            color:
+                                event.category?.color.withValues(alpha: 0.9) ??
+                                    EventCategory.other.color
+                                        .withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: Row(
@@ -222,7 +226,7 @@ class EventCard extends StatelessWidget {
                               vertical: 2.h,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.warning.withOpacity(0.1),
+                              color: AppColors.warning.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(4.r),
                             ),
                             child: Text(

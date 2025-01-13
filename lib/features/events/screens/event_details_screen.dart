@@ -357,7 +357,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen>
               context,
               icon: CupertinoIcons.time,
               title: 'Response Cutoff',
-              value: _formatDateTime(widget.event.responseCutoff!),
+              value: _formatDateTime(widget.event.responseCutoff),
             ),
           ],
         ],
