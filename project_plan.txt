@@ -8,45 +8,114 @@
 - Event response handling
 
 ### Features
-- [ ] Event Creation
-  - Basic event details (name, date, time, location)
-  - Min/max participant settings
-  - Response cutoff time
-  - Waitlist functionality
+- [x] Event Creation
+  - [x] Basic event details (name, date, time, location)
+  - [x] Min/max participant settings
+  - [x] Response cutoff time
+  - [x] Waitlist functionality
   
 - [ ] User Management
-  - Email-only signup
-  - Basic user profile (name, DOB, contact info)
-  - Account linking capability
+  - [ ] Email-only signup
+  - [ ] Basic user profile (name, DOB, contact info)
+  - [ ] Account linking capability
   
 - [ ] Response System
-  - Email-based response mechanism
-  - Attendance tracking
-  - Waitlist management
+  - [ ] Email-based response mechanism
+  - [ ] Attendance tracking
+  - [ ] Waitlist management
   
 - [ ] Notification System
-  - Response reminders
-  - Event reminders
-  - Admin notifications
+  - [ ] Response reminders
+  - [ ] Event reminders
+  - [ ] Admin notifications
+
+### Navigation Structure
+- [ ] Bottom Navigation Bar
+  - Home: Main feed and discovery
+  - Events: Full event management and calendar
+  - Create: Quick access to event creation
+  - Notifications: Dedicated notification center
+  - Profile: User settings and management
+
+### Home Screen (Main Tab)
+- [ ] Header Section
+  - [ ] Welcome message/Location
+  - [ ] Quick search bar
+  - [ ] Create event button (duplicated from nav for convenience)
+  
+- [ ] Featured Events
+  - [ ] Carousel of upcoming popular events
+  - [ ] Visual event cards with key info
+  - [ ] Quick RSVP actions
+  
+- [ ] Discover Section
+  - [ ] Trending categories
+  - [ ] Events near you
+  - [ ] Recommended based on interests
+  
+- [ ] Activity Feed
+  - [ ] Recent RSVPs from friends
+  - [ ] Upcoming event reminders
+  - [ ] New events in followed categories
+
+### Events Screen (Events Tab)
+- [ ] Your Events Overview
+  - [ ] Events you're hosting
+  - [ ] Events you're attending
+  - [ ] Pending invitations
+  - [ ] Waitlist status
+  
+- [ ] Calendar View
+  - [ ] Monthly/weekly toggle
+  - [ ] Event indicators
+  - [ ] Quick date navigation
+  
+- [ ] List View
+  - [ ] Filterable event list
+  - [ ] Sort by date/category/status
+  - [ ] Search functionality
+
+### Notifications Screen (Notifications Tab)
+- [ ] Categorized Notifications
+  - [ ] Event invites
+  - [ ] RSVP updates
+  - [ ] Event changes
+  - [ ] Reminders
+  - [ ] Friend activity
+
+### Profile Screen (Profile Tab)
+- [ ] User Info Management
+  - [ ] Profile details
+  - [ ] Preferences
+  - [ ] Connected accounts
+  
+- [ ] Event History
+  - [ ] Past events attended
+  - [ ] Hosted events
+  
+- [ ] Settings
+  - [ ] Notification preferences
+  - [ ] Privacy settings
+  - [ ] App settings
 
 ## Phase 2: Enhanced Features
 - [ ] Payment Integration
-  - Payment processing
-  - Automated charging
-  - Commission handling
+  - [ ] Payment processing
+  - [ ] Automated charging
+  - [ ] Commission handling
   
-- [ ] Advanced Event Features
-  - Recurring events
-  - Age restrictions
-  - Multiple admin support
+- [x] Advanced Event Features
+  - [x] Recurring events
+  - [x] Age restrictions
+  - [ ] Multiple admin support
   
-- [ ] Analytics
-  - Basic attendance tracking
-  - Response rate analytics
+- [x] Analytics
+  - [x] Basic attendance tracking
+  - [x] Response rate analytics
   
 ## Phase 3: Future Expansion
-- [ ] Event Categories
-- [ ] Public/Private Event System
+- [x] Event Categories
+- [x] Public/Private Event System
 - [ ] Search Functionality
 - [ ] Business Profiles
 - [ ] Advanced Analytics
