@@ -14,10 +14,17 @@
   - [x] Response cutoff time
   - [x] Waitlist functionality
   
-- [ ] User Management
+- [x] User Management
   - [ ] Email-only signup
   - [x] Basic user profile (name, DOB, contact info)
-  - [ ] Account linking capability
+  - [x] Profile screen and navigation
+  - [x] Settings management
+    - [x] Edit profile
+    - [x] Privacy settings
+    - [x] Notification preferences
+    - [x] Connected accounts
+    - [x] App settings
+  - [x] Account linking capability
   
 - [ ] Response System
   - [ ] Email-based response mechanism
@@ -35,7 +42,7 @@
   - Events: Full event management and calendar
   - Create: Quick access to event creation
   - Notifications: Dedicated notification center
-  - Profile: User settings and management
+  - Profile: User settings and management (✓)
 
 ### Home Screen (Main Tab)
 - [ ] Header Section
@@ -85,18 +92,35 @@
 
 ### Profile Screen (Profile Tab)
 - [x] User Info Management
-  - [x] Profile details
-  - [x] Preferences
-  - [x] Connected accounts
+  - [x] Profile photo upload
+  - [x] Basic info display
+  - [x] Edit profile navigation
+  - [x] Settings navigation
   
-- [x] Event History
-  - [x] Past events attended
-  - [x] Hosted events
+- [x] Settings Screens
+  - [x] Edit Profile
+    - [x] Photo management
+    - [x] Personal information
+    - [x] Contact information
+  - [x] Privacy Settings
+    - [x] Profile privacy
+    - [x] Event privacy
+    - [x] Data management
+  - [x] Notification Preferences
+    - [x] Notification types
+    - [x] Notification methods
+  - [x] Connected Accounts
+    - [x] Social accounts
+    - [x] Calendar integration
+  - [x] App Settings
+    - [x] Appearance
+    - [x] Localization
+    - [x] Services
+    - [x] About
   
-- [x] Settings
-  - [x] Notification preferences
-  - [x] Privacy settings
-  - [x] App settings
+- [ ] Event History
+  - [ ] Past events attended
+  - [ ] Hosted events
 
 ## Phase 2: Enhanced Features
 - [ ] Payment Integration
@@ -146,7 +170,12 @@ lib/
     │       └── notifications_screen.dart
     └── user/             # User management
         └── screens/
-            └── profile_screen.dart
+            ├── profile_screen.dart
+            ├── edit_profile_screen.dart
+            ├── privacy_settings_screen.dart
+            ├── notification_preferences_screen.dart
+            ├── connected_accounts_screen.dart
+            └── app_settings_screen.dart
 ├── utils/                 # Utility functions
 └── widgets/              # Reusable widgets
     ├── common/           # Shared widgets
