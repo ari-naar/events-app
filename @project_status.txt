@@ -30,6 +30,20 @@
 - Share options with error handling
 - Analytics button with smooth navigation
 
+### Profile Screen
+- Modern user profile layout
+- Profile photo placeholder
+- User information display and management
+- Event history tracking (hosted/attended)
+- Settings management
+  - Notification preferences
+  - Privacy settings
+  - Connected accounts
+  - App settings
+- Sign out functionality with confirmation
+- Consistent design with app theme
+- Responsive layout with proper spacing
+
 ### Analytics Features
 - Overview section with participant counts and details access
 - Gender distribution chart with animated pie sections and counts
